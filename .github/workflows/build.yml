@@ -42,6 +42,7 @@ jobs:
           url="$(vercel deploy --prebuilt --yes \
             --token=${{ secrets.VERCEL_TOKEN }} \
             --scope=${{ secrets.VERCEL_TEAM_SLUG }})"
+          echo "Deploying to URL: $url"
           vercel alias --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_TEAM_SLUG }} set "$url" dev.tj-renovatie.nl
           echo "Deployed to URL: $url"
 
