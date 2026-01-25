@@ -12,4 +12,5 @@ updates:
       time: "10:00"
     target:
       branches:
-        - dev
+        - main
+
