@@ -30,14 +30,13 @@ export default async function handler(req, res) {
       }
     }
 
-    // const resend = new Resend(process.env.RESEND_API_KEY);
-    const resend = new Resend("re_QAeQ9wr4_P8rfJWfK8s5fNyVXYG9FUFZ5");
+    const resend = new Resend(process.env.RESEND_API_KEY);
     try {
       await resend.emails.send({
         from: `TJ Renovatie NOREPLY <noreply@tj-renovatie.nl>`,
         to: `${name} <${email}>`,
         subject: "Bevestiging van uw bericht",
-        html: ` 
+        html: `
         <!DOCTYPE html>
         <html lang="en">
         <head>
