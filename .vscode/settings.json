@@ -1,0 +1,37 @@
+{
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "files.autoSave": "onFocusChange",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "[css]": {
+    "editor.suggest.insertMode": "replace"
+  },
+  "[javascriptreact]": {},
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.wordWrapColumn": 1,
+  "editor.wordWrap": "on",
+  "workbench.sideBar.location": "right",
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#988100",
+    "activityBar.background": "#988100",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#00dfbd",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#e7e7e799",
+    "sash.hoverBorder": "#988100",
+    "statusBar.background": "#655600",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#988100",
+    "statusBarItem.remoteBackground": "#655600",
+    "statusBarItem.remoteForeground": "#e7e7e7",
+    "titleBar.activeBackground": "#655600",
+    "titleBar.activeForeground": "#e7e7e7",
+    "titleBar.inactiveBackground": "#65560099",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#655600"
+}

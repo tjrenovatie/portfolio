@@ -1,0 +1,29 @@
+# Allow all crawlers access to all content
+User-agent: *
+Disallow:
+
+# Disallow access to specific directories
+Disallow: /private/
+Disallow: /tmp/
+
+# Sitemap location
+Sitemap: https://tj-renovatie.nl/sitemap.xml
+
+# Specific directives for major search engines
+User-agent: Googlebot
+# Increase crawl rate for Google
+Crawl-delay: 10
+Disallow: /no-google/
+
+User-agent: Bingbot
+# Decrease crawl rate for Bing
+Crawl-delay: 20
+Disallow: /no-bing/
+
+# Prevent web archives from storing pages
+User-agent: ia_archiver
+Disallow: /
+
+# Block a specific spam bot by user-agent
+User-agent: BadBot
+Disallow: /

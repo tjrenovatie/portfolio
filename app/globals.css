@@ -1,0 +1,226 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*================== GOOGLE FONTS ==================*/
+@import url("boxicons/css/boxicons.min.css");
+
+html {
+  min-height: calc(100% + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+:root {
+  --background-end-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+
+  /*================== Font and Typography ==================*/
+  --normal-font-size: 1rem;
+
+  --color-primary: #e26260;
+  --color-secondary: #b04a48;
+  --color-primary-title: #665700;
+
+  --safe-area-top: env(safe-area-inset-top, 20px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+@supports (-webkit-touch-callout: none) {
+  :root {
+    --safe-area-top: env(safe-area-inset-top, 20px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+  }
+
+  body {
+    padding-top: var(--safe-area-top);
+    padding-left: var(--safe-area-left);
+    padding-right: var(--safe-area-right);
+    padding-bottom: var(--safe-area-bottom);
+  }
+}
+
+body {
+  padding-top: var(--safe-area-top);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+  padding-bottom: var(--safe-area-bottom);
+}
+
+body,
+button,
+input,
+textarea {
+  font-size: var(--normal-font-size);
+}
+
+h1,
+h2,
+p,
+a {
+  font-family: var(--font-lato);
+}
+
+a:hover {
+  color: var(--color-secondary);
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+h1 {
+  color: var(--color-primary-text);
+}
+
+.border-primary-color {
+  border-color: var(--color-primary);
+}
+
+.profile-image {
+  object-fit: cover;
+  object-position: 50% 50%;
+}
+
+/*================== SCREEN SIZES ==================*/
+@media (max-width: 1200px) {
+  .profile-image {
+    object-fit: cover;
+    object-position: 50% 50% !important;
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 992px) {
+}
+
+@media (max-width: 768px) {
+  .profile-image {
+    object-fit: cover;
+    object-position: 50% 50% !important;
+    transform: scale(1.5);
+  }
+}
+
+@media (max-width: 576px) {
+  .profile-image {
+    object-fit: cover;
+    object-position: 10% 80%;
+    transform: scale(1);
+  }
+}
+
+/* Responsive font sizes for headings and paragraphs */
+h1 {
+  font-size: 2.25rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+}
+
+h5 {
+  font-size: 1.125rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+p {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+@media (min-width: 640px) {
+  /* sm */
+  h1 {
+    font-size: 2.75rem;
+  }
+  h2 {
+    font-size: 2.25rem;
+  }
+  h3 {
+    font-size: 1.75rem;
+  }
+  h4 {
+    font-size: 1.5rem;
+  }
+  h5 {
+    font-size: 1.25rem;
+  }
+  h6 {
+    font-size: 1.125rem;
+  }
+  p {
+    font-size: 1.125rem;
+  }
+}
+@media (min-width: 768px) {
+  /* md */
+  h1 {
+    font-size: 3.5rem;
+  }
+  h2 {
+    font-size: 2.75rem;
+  }
+  h3 {
+    font-size: 2.25rem;
+  }
+  h4 {
+    font-size: 1.75rem;
+  }
+  h5 {
+    font-size: 1.5rem;
+  }
+  h6 {
+    font-size: 1.25rem;
+  }
+  p {
+    font-size: 1.25rem;
+  }
+}
+@media (max-width: 375px) {
+  /* iPhone SE and similar small screens */
+  h1 {
+    font-size: 1.5rem;
+  }
+  h2 {
+    font-size: 1.25rem;
+  }
+  h3 {
+    font-size: 1.125rem;
+  }
+  h4 {
+    font-size: 1rem;
+  }
+  h5 {
+    font-size: 0.95rem;
+  }
+  h6 {
+    font-size: 0.9rem;
+  }
+  p {
+    font-size: 0.95rem;
+  }
+}
