@@ -35,6 +35,19 @@ jobs:
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
 
+      - name: Debug – List Vercel domains for this scope
+        run: |
+          echo "Listing domains for scope: ${{ secrets.VERCEL_ORG_ID }}"
+          vercel domains ls \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Debug – List Vercel projects for this scope
+        run: |
+          vercel projects ls \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }}
+
       - name: Build & Deploy Project Artifacts to Preview
         if: ${{ inputs.environment == 'preview' }}
         run: |
