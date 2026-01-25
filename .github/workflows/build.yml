@@ -24,10 +24,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # - name: Configure Git author for Vercel
-      #   run: |
-      #     git config --global user.name "andante-ray0s-7071"
-      #     git config --global user.email "andante-ray.0s@icloud.com"
+      - name: Configure Git author for Vercel
+        run: |
+          git config --global user.name "tjrenovatie"
+          git config --global user.email "info@tj-renovatie.nl"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
