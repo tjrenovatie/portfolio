@@ -52,10 +52,10 @@ export async function GET() {
     });
 
     const response = NextResponse.json({ data: result });
-    response.headers.set(
-      "Cache-Control",
-      "public, s-maxage=86400, max-age=3600, stale-while-revalidate=3600"
-    );
+    // response.headers.set(
+    //   "Cache-Control",
+    //   "public, s-maxage=86400, max-age=3600, stale-while-revalidate=3600"
+    // );
     return response;
   } catch (error) {
     console.error("Blob list error:", error);
