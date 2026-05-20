@@ -63,7 +63,7 @@ export default async function ProjectImagesPage({
         </div>
       </section>
 
-      <ImageUploadForm />
+      <ImageUploadForm projectId={project.id} />
     </article>
   );
 }

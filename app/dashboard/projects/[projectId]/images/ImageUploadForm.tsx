@@ -1,11 +1,15 @@
 "use client";
 
 import { PhotoIcon } from "@heroicons/react/24/outline";
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import {
   DashboardButton,
   DashboardFileInput,
 } from "@/components/dashboard";
+import {
+  convertGalleryImagesAction,
+  initialConvertGalleryImagesState,
+} from "./actions";
 
 const MAX_IMAGE_SIZE = 15 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set([
@@ -40,8 +44,12 @@ function validateImage(file: File) {
   return errors;
 }
 
-export default function ImageUploadForm() {
+export default function ImageUploadForm({ projectId }: { projectId: string }) {
   const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
+  const [state, formAction, isPending] = useActionState(
+    convertGalleryImagesAction.bind(null, projectId),
+    initialConvertGalleryImagesState,
+  );
   const invalidCount = useMemo(
     () => selectedImages.filter((image) => image.errors.length > 0).length,
     [selectedImages],
@@ -50,7 +58,7 @@ export default function ImageUploadForm() {
   const hasErrors = invalidCount > 0;
 
   return (
-    <form className="space-y-6" encType="multipart/form-data">
+    <form action={formAction} className="space-y-6" encType="multipart/form-data">
       <DashboardFileInput
         id="project-gallery-images"
         name="images"
@@ -64,6 +72,7 @@ export default function ImageUploadForm() {
         }
         label="Gallery images"
         multiple
+        error={state.fieldErrors?.images}
         title="Select project images"
         onChange={(event) => {
           const files = Array.from(event.currentTarget.files ?? []);
@@ -135,18 +144,83 @@ export default function ImageUploadForm() {
         </section>
       )}
 
+      {state.message && (
+        <section
+          className={`rounded-md border px-5 py-4 text-sm font-semibold ${
+            state.status === "success"
+              ? "border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-200"
+              : "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
+          }`}
+        >
+          {state.message}
+        </section>
+      )}
+
+      {state.fileErrors && state.fileErrors.length > 0 && (
+        <section className="rounded-md border border-red-200 bg-red-50 p-5 dark:border-red-900 dark:bg-red-950">
+          <h3 className="text-sm font-bold text-red-800 dark:text-red-200">
+            File validation errors
+          </h3>
+          <div className="mt-3 space-y-3">
+            {state.fileErrors.map((fileError) => (
+              <div key={fileError.name}>
+                <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                  {fileError.name}
+                </p>
+                <ul className="mt-1 space-y-1">
+                  {fileError.errors.map((error) => (
+                    <li
+                      key={error}
+                      className="text-sm text-red-700 dark:text-red-300"
+                    >
+                      {error}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {state.convertedImages && state.convertedImages.length > 0 && (
+        <section className="rounded-md border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+          <div className="border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
+            <h3 className="text-base font-bold text-neutral-950 dark:text-white">
+              Converted AVIF output
+            </h3>
+          </div>
+          <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
+            {state.convertedImages.map((image) => (
+              <div key={image.pathname} className="px-5 py-4">
+                <p className="text-sm font-semibold text-neutral-950 dark:text-white">
+                  {image.originalName}
+                </p>
+                <p className="mt-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                  {image.pathname}
+                </p>
+                <p className="mt-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                  {image.width ?? "Unknown"} x {image.height ?? "Unknown"} ·{" "}
+                  {formatBytes(image.outputSize)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       <div className="rounded-md border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
         <DashboardButton
           type="submit"
-          disabled
+          disabled={!hasImages || hasErrors || isPending}
           className="min-h-11 w-full px-5 sm:w-auto"
-          variant="disabled"
+          variant={!hasImages || hasErrors || isPending ? "disabled" : "primary"}
         >
-          Upload images
+          {isPending ? "Converting..." : "Convert images"}
         </DashboardButton>
         <p className="mt-3 text-xs leading-5 text-neutral-500 dark:text-neutral-400">
-          Upload is disabled until AVIF conversion and Blob storage are added in
-          the next steps.
+          This step converts images to AVIF and prepares stable blob paths.
+          Upload and database storage are added in step 6.
         </p>
         {hasErrors && (
           <p className="mt-2 text-sm font-semibold text-red-600 dark:text-red-400">

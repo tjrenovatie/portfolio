@@ -2,21 +2,17 @@
 
 import { del, put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
-import sharp from "sharp";
 import {
   createProjectRecord,
   createProjectThumbnailRecord,
   deleteProjectRecord,
   projectSlugExists,
 } from "@/lib/db-projects";
-
-const MAX_THUMBNAIL_SIZE = 10 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = new Set([
-  "image/avif",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
+import {
+  convertImageFileToAvif,
+  MAX_THUMBNAIL_IMAGE_SIZE,
+  validateUploadImage,
+} from "@/lib/image-processing";
 
 export type CreateProjectState = {
   fieldErrors?: {
@@ -90,12 +86,13 @@ function validateProjectInput({
     fieldErrors.description = "Description must be 2000 characters or fewer.";
   }
 
-  if (!thumbnail || thumbnail.size === 0) {
-    fieldErrors.thumbnail = "Thumbnail image is required.";
-  } else if (!ALLOWED_IMAGE_TYPES.has(thumbnail.type)) {
-    fieldErrors.thumbnail = "Use an AVIF, JPG, PNG, or WebP image.";
-  } else if (thumbnail.size > MAX_THUMBNAIL_SIZE) {
-    fieldErrors.thumbnail = "Thumbnail must be 10 MB or smaller.";
+  const thumbnailError = validateUploadImage(thumbnail, {
+    maxSize: MAX_THUMBNAIL_IMAGE_SIZE,
+    requiredMessage: "Thumbnail image is required.",
+  });
+
+  if (thumbnailError) {
+    fieldErrors.thumbnail = thumbnailError;
   }
 
   return fieldErrors;
@@ -139,21 +136,19 @@ export async function createProjectAction(
   let projectId: string | null = null;
 
   try {
-    const inputBuffer = Buffer.from(await thumbnail.arrayBuffer());
-    const { data: avifBuffer, info } = await sharp(inputBuffer)
-      .rotate()
-      .avif({ quality: 72 })
-      .toBuffer({ resolveWithObject: true });
-
     const slug = await createUniqueSlug(name);
     const project = await createProjectRecord({ description, name, slug });
     projectId = project.id;
     blobPathname = `projects/${project.id}/thumbnail.avif`;
+    const thumbnailImage = await convertImageFileToAvif(
+      thumbnail,
+      blobPathname,
+    );
 
-    const blob = await put(blobPathname, avifBuffer, {
+    const blob = await put(blobPathname, thumbnailImage.buffer, {
       access: "public",
       allowOverwrite: true,
-      contentType: "image/avif",
+      contentType: thumbnailImage.contentType,
       token,
     });
 
@@ -162,11 +157,11 @@ export async function createProjectAction(
       blobContentType: blob.contentType ?? "image/avif",
       blobDownloadUrl: blob.downloadUrl ?? null,
       blobPathname: blob.pathname,
-      blobSize: avifBuffer.byteLength,
+      blobSize: thumbnailImage.outputSize,
       blobUrl: blob.url,
-      height: info.height ?? null,
+      height: thumbnailImage.height,
       projectId: project.id,
-      width: info.width ?? null,
+      width: thumbnailImage.width,
     });
 
     revalidatePath("/dashboard/projects");
