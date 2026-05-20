@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { Variants } from "framer-motion";
 import { ButtonLink } from "@/components/button";
 import {
   MotionDiv,
@@ -14,7 +15,7 @@ const contactHighlights = [
   "Persoonlijke opvolging",
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -23,7 +24,7 @@ const containerVariants = {
   },
 };
 
-const revealUp = {
+const revealUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
@@ -35,7 +36,7 @@ const revealUp = {
   },
 };
 
-const revealRight = {
+const revealRight: Variants = {
   hidden: { opacity: 0, x: 24 },
   visible: {
     opacity: 1,
@@ -48,7 +49,7 @@ const revealRight = {
   },
 };
 
-const contactSectionVariants = {
+const contactSectionVariants: Variants = {
   hidden: { opacity: 0, y: 96 },
   visible: {
     opacity: 1,
