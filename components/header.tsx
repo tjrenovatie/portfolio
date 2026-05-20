@@ -1,18 +1,15 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useCurrentPage } from "@/hooks/useCurrentPage";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isHome } = useCurrentPage();
-  const router = useRouter();
-  const pending = useRef<string | null>(null);
+  const pathname = usePathname();
+  const isHome = pathname === "/";
 
   const navigation = [
     { name: "HOME", href: "/" },
@@ -21,44 +18,28 @@ export default function Header() {
     { name: "CONTACT", href: "/contact" },
   ];
 
-  const open = () => {
-    setIsOpen(true);
-  };
-
-  const close = (href?: string) => {
-    if (href) {
-      pending.current = href;
-    }
+  const close = () => {
     setIsOpen(false);
-  };
-
-  const onExitComplete = () => {
-    if (pending.current) {
-      router.push(pending.current);
-      pending.current = null;
-    }
   };
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 h-20 ${
-        isHome
-          ? "bg-transparent"
-          : "bg-marble-dark bg-cover bg-center shadow-2xl"
+      className={`fixed left-0 top-0 z-50 h-20 w-full ${
+        isHome ? "lg:hidden" : "bg-marble-dark bg-cover bg-center shadow-2xl"
       }`}
     >
-      {!isHome && <div className="absolute inset-0 bg-black/50" />}
+      {!isHome && <div className="absolute inset-0 bg-black/55" />}
 
-      <nav className="relative mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
+      <nav className="relative mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {!isHome && (
           <div className="flex lg:flex-1">
-            <Link href="/" className="flex items-center group">
+            <Link href="/" className="flex items-center">
               <Image
                 src="/assets/img/logo.avif"
                 alt="TJ Renovatie Logo"
                 width={64}
                 height={64}
-                className="h-8 w-auto md:h-10"
+                className="h-10 w-auto md:h-12"
                 draggable={false}
                 priority
               />
@@ -66,36 +47,60 @@ export default function Header() {
           </div>
         )}
 
-        <div className={`flex lg:hidden ${isHome ? "ml-auto" : ""}`}>
+        <div className={`flex ${isHome ? "ml-auto" : "lg:hidden"}`}>
           <button
             type="button"
-            onClick={() => {
-              open();
-            }}
-            className="-m-2.5 inline-flex items-center justify-center rounded-full bg-white p-1 text-[var(--color-primary)] shadow-sm transition-colors "
+            aria-label={isOpen ? "Close main menu" : "Open main menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => setIsOpen((open) => !open)}
+            className={`inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-black/25 text-[var(--color-primary)] shadow-lg shadow-black/20 backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:bg-black/35 hover:text-[var(--color-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+              isOpen
+                ? "fixed right-4 top-4 z-[70] rotate-90 sm:right-6"
+                : "relative"
+            }`}
           >
-            <span className="sr-only">Open main menu</span>
-            <Bars3Icon
+            <span
               aria-hidden="true"
-              className="size-6 text-[var(--color-primary)]"
+              className={`absolute h-0.5 w-6 rounded-full bg-current transition-transform duration-300 ease-out ${
+                isOpen ? "translate-y-0 rotate-45" : "-translate-y-2"
+              }`}
+            />
+            <span
+              aria-hidden="true"
+              className={`absolute h-0.5 w-6 rounded-full bg-current transition-all duration-200 ease-out ${
+                isOpen ? "scale-x-0 opacity-0" : "scale-x-75 opacity-100"
+              }`}
+            />
+            <span
+              aria-hidden="true"
+              className={`absolute h-0.5 w-6 rounded-full bg-current transition-transform duration-300 ease-out ${
+                isOpen ? "translate-y-0 -rotate-45" : "translate-y-2"
+              }`}
             />
           </button>
         </div>
 
-        <div className="hidden lg:flex lg:gap-x-10 lg:flex-1 lg:justify-end">
-          {navigation.map((item) => (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="text-sm font-semibold text-[--color-primary]"
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
+        {!isHome && (
+          <div className="hidden lg:flex lg:gap-x-10 lg:flex-1 lg:justify-end">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`text-sm font-semibold transition-colors ${
+                  pathname === item.href
+                    ? "text-white"
+                    : "text-[--color-primary] hover:text-white"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        )}
       </nav>
 
-      <AnimatePresence onExitComplete={onExitComplete}>
+      <AnimatePresence>
         {isOpen && (
           <>
             <motion.div
@@ -103,28 +108,19 @@ export default function Header() {
               animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-black"
-              onClick={() => close()}
+              className={`fixed inset-0 bg-black ${isHome ? "" : "lg:hidden"}`}
+              onClick={close}
             />
             <motion.div
+              id="mobile-navigation"
               initial={{ opacity: 0, x: "100%" }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: "100%" }}
-              transition={{ duration: 0.3, ease: "easeIn", type: "tween" }}
-              className="fixed inset-y-0 right-0 w-full bg-gray-900 p-6 sm:w-80 flex flex-col justify-center"
+              transition={{ duration: 0.28, ease: "easeOut", type: "tween" }}
+              className={`fixed inset-y-0 right-0 flex w-full flex-col justify-center bg-gray-950 p-6 shadow-2xl sm:w-80 ${
+                isHome ? "" : "lg:hidden"
+              }`}
             >
-              <div className="absolute top-6 right-6">
-                <button
-                  title="close"
-                  onClick={() => {
-                    close();
-                  }}
-                  className="-m-2.5 p-2.5 text-gray-400 hover:text-white"
-                >
-                  <XMarkIcon className="size-6" />
-                </button>
-              </div>
-
               <nav className="flex flex-col items-center space-y-8">
                 <motion.ul
                   initial="hidden"
@@ -149,7 +145,7 @@ export default function Header() {
                   }}
                   className="flex w-full flex-col items-center space-y-8"
                 >
-                  {navigation.map((item, i) => (
+                  {navigation.map((item) => (
                     <motion.li
                       key={item.name}
                       variants={{
@@ -169,11 +165,13 @@ export default function Header() {
                     >
                       <Link
                         href={item.href}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          close(item.href);
-                        }}
-                        className="block rounded-lg py-3 text-center text-lg font-semibold text-[var(--color-primary)] hover:bg-white/10 transition-colors"
+                        onClick={close}
+                        aria-current={pathname === item.href ? "page" : undefined}
+                        className={`relative block rounded-lg py-3 text-center text-lg font-semibold transition-colors hover:bg-white/10 ${
+                          pathname === item.href
+                            ? "bg-white/10 text-[var(--color-primary)]"
+                            : "text-white hover:text-[var(--color-primary)]"
+                        }`}
                       >
                         {item.name}
                       </Link>

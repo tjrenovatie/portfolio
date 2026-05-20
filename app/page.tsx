@@ -21,7 +21,7 @@ const Home = () => {
 
   return (
     <motion.article
-      className="relative flex items-center justify-center w-full h-screen bg-cover bg-center bg-marble-dark"
+      className="fixed inset-0 flex h-dvh w-dvw items-center justify-center overflow-hidden bg-marble-dark bg-cover bg-center"
       initial={!hasAnimated ? { opacity: 0 } : false}
       animate={!hasAnimated ? { opacity: 1 } : false}
       transition={{ duration: 0.2, delay: 0.2 }}
@@ -63,7 +63,7 @@ const Home = () => {
         </div>
 
         {/* Navigation Links */}
-        <div className="hidden md:flex flex-col items-center gap-6 md:flex-row md:justify-center ">
+        <div className="hidden lg:flex flex-col items-center gap-6 md:flex-row md:justify-center ">
           {navigationLinks.map((page) => (
             <Link
               key={page.name}
@@ -78,7 +78,7 @@ const Home = () => {
 
       {/* Social Links */}
       <motion.footer
-        className="absolute bottom-0 w-full h-[4rem] text-center text-white"
+        className="absolute bottom-0 flex h-[4rem] w-full items-end justify-center pb-20 text-center text-white lg:pb-10"
         initial={!hasAnimated ? { y: 100 } : false}
         animate={!hasAnimated ? { y: 0 } : false}
         transition={{ duration: 0.5, delay: 0.5 }}
