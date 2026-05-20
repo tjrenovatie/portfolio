@@ -5,15 +5,15 @@ import type { ReactNode } from "react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   ChartBarIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   FolderIcon,
   HomeIcon,
   MoonIcon,
+  RectangleGroupIcon,
   PhotoIcon,
   SunIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
+import { DashboardButton } from "@/components/dashboard";
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: ChartBarIcon },
@@ -86,6 +86,18 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <aside
         className={`fixed inset-y-0 left-0 hidden border-r transition-[width,background-color,border-color] lg:flex lg:flex-col ${sidebarWidthClasses} ${panelClasses}`}
       >
+        <DashboardButton
+          aria-label={
+            isSidebarCollapsed ? "Expand side menu" : "Collapse side menu"
+          }
+          aria-expanded={!isSidebarCollapsed}
+          onClick={() => setIsSidebarCollapsed((current) => !current)}
+          className="absolute right-0 top-20 z-10 h-9 w-9 translate-x-1/2 rounded-full !gap-0 !p-0 shadow-sm"
+          variant="secondary"
+        >
+          <RectangleGroupIcon className="h-5 w-5" aria-hidden="true" />
+        </DashboardButton>
+
         <div
           className={`flex h-16 items-center justify-between border-b px-3 ${
             isDarkMode ? "border-neutral-800" : "border-neutral-200"
@@ -100,16 +112,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           >
             {isSidebarCollapsed ? "TJ" : "TJ Renovatie"}
           </Link>
-          {!isSidebarCollapsed && (
-            <button
-              type="button"
-              aria-label="Collapse side menu"
-              onClick={() => setIsSidebarCollapsed(true)}
-              className={`inline-flex h-9 w-9 items-center justify-center rounded-md border transition-colors ${iconButtonClasses}`}
-            >
-              <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-            </button>
-          )}
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 px-3 py-4">
@@ -147,17 +149,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <HomeIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
             {!isSidebarCollapsed && <span>Public site</span>}
           </Link>
-
-          {isSidebarCollapsed && (
-            <button
-              type="button"
-              aria-label="Expand side menu"
-              onClick={() => setIsSidebarCollapsed(false)}
-              className={`mt-2 inline-flex h-11 w-full items-center justify-center rounded-md border transition-colors ${iconButtonClasses}`}
-            >
-              <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-            </button>
-          )}
         </div>
       </aside>
 

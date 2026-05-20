@@ -9,7 +9,7 @@ type DashboardButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const baseClasses =
-  "inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--color-primary]";
+  "inline-flex min-h-10 items-center justify-center gap-2 px-4 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--color-primary]";
 
 const variantClasses: Record<DashboardButtonVariant, string> = {
   primary:
@@ -33,7 +33,12 @@ export function DashboardButton({
   return (
     <button
       type={type}
-      className={[baseClasses, variantClasses[variant], className ?? ""]
+      className={[
+        baseClasses,
+        className?.includes("rounded-") ? "" : "rounded-md",
+        variantClasses[variant],
+        className ?? "",
+      ]
         .filter(Boolean)
         .join(" ")}
       {...props}
