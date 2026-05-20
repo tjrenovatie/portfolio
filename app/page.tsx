@@ -46,7 +46,7 @@ const Home = () => {
         <div className="relative flex justify-center w-full">
           <div className="w-[15rem] h-[10rem] sm:w-[20rem] sm:h-[15rem] md:w-[25rem] md:h-[15rem] lg:w-[30rem] lg:h-[20rem] relative">
             <Image
-              src="/assets/img/logo.png"
+              src="/assets/img/logo.avif"
               alt="TJ Renovatie Logo"
               layout="fill"
               objectFit="contain"

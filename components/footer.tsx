@@ -13,7 +13,7 @@ export default function Footer() {
         {/* Logo Section */}
         <div className="flex justify-center mb-10">
           <Image
-            src="/assets/img/logo.png"
+            src="/assets/img/logo.avif"
             alt="TJ Renovatie Logo"
             width={128}
             height={128}

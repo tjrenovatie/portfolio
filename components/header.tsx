@@ -54,7 +54,7 @@ export default function Header() {
           <div className="flex lg:flex-1">
             <Link href="/" className="flex items-center group">
               <Image
-                src="/assets/img/logo.png"
+                src="/assets/img/logo.avif"
                 alt="TJ Renovatie Logo"
                 width={64}
                 height={64}
