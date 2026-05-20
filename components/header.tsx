@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/button";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,37 +49,52 @@ export default function Header() {
         )}
 
         <div className={`flex ${isHome ? "ml-auto" : "lg:hidden"}`}>
-          <button
-            type="button"
-            aria-label={isOpen ? "Close main menu" : "Open main menu"}
-            aria-expanded={isOpen}
-            aria-controls="mobile-navigation"
-            onClick={() => setIsOpen((open) => !open)}
-            className={`inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-black/25 text-[var(--color-primary)] shadow-lg shadow-black/20 backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:bg-black/35 hover:text-[var(--color-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
-              isOpen
-                ? "fixed right-4 top-4 z-[70] rotate-90 sm:right-6"
-                : "relative"
-            }`}
-          >
-            <span
-              aria-hidden="true"
-              className={`absolute h-0.5 w-6 rounded-full bg-current transition-transform duration-300 ease-out ${
-                isOpen ? "translate-y-0 rotate-45" : "-translate-y-2"
-              }`}
-            />
-            <span
-              aria-hidden="true"
-              className={`absolute h-0.5 w-6 rounded-full bg-current transition-all duration-200 ease-out ${
-                isOpen ? "scale-x-0 opacity-0" : "scale-x-75 opacity-100"
-              }`}
-            />
-            <span
-              aria-hidden="true"
-              className={`absolute h-0.5 w-6 rounded-full bg-current transition-transform duration-300 ease-out ${
-                isOpen ? "translate-y-0 -rotate-45" : "translate-y-2"
-              }`}
-            />
-          </button>
+          {isOpen ? (
+            <Button
+              type="button"
+              variant="dark"
+              aria-label="Close main menu"
+              aria-expanded="true"
+              aria-controls="mobile-navigation"
+              onClick={() => setIsOpen(false)}
+              className="fixed right-4 top-4 z-[70] !h-12 !w-12 rotate-90 !gap-0 !rounded-full border border-white/25 !bg-black/25 !p-0 !text-[var(--color-primary)] shadow-lg shadow-black/20 backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:!bg-black/35 hover:!text-[var(--color-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-6"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute h-0.5 w-6 translate-y-0 rotate-45 rounded-full bg-current transition-transform duration-300 ease-out"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute h-0.5 w-6 scale-x-0 rounded-full bg-current opacity-0 transition-all duration-200 ease-out"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute h-0.5 w-6 translate-y-0 -rotate-45 rounded-full bg-current transition-transform duration-300 ease-out"
+              />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="dark"
+              aria-label="Open main menu"
+              aria-expanded="false"
+              onClick={() => setIsOpen(true)}
+              className="relative !h-12 !w-12 !gap-0 !rounded-full border border-white/25 !bg-black/25 !p-0 !text-[var(--color-primary)] shadow-lg shadow-black/20 backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:!bg-black/35 hover:!text-[var(--color-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute h-0.5 w-6 -translate-y-2 rounded-full bg-current transition-transform duration-300 ease-out"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute h-0.5 w-6 scale-x-75 rounded-full bg-current opacity-100 transition-all duration-200 ease-out"
+              />
+              <span
+                aria-hidden="true"
+                className="absolute h-0.5 w-6 translate-y-2 rounded-full bg-current transition-transform duration-300 ease-out"
+              />
+            </Button>
+          )}
         </div>
 
         {!isHome && (
@@ -166,7 +182,9 @@ export default function Header() {
                       <Link
                         href={item.href}
                         onClick={close}
-                        aria-current={pathname === item.href ? "page" : undefined}
+                        aria-current={
+                          pathname === item.href ? "page" : undefined
+                        }
                         className={`relative block rounded-lg py-3 text-center text-lg font-semibold transition-colors hover:bg-white/10 ${
                           pathname === item.href
                             ? "bg-white/10 text-[var(--color-primary)]"
