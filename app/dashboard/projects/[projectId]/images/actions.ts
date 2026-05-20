@@ -1,6 +1,12 @@
 "use server";
 
-import { getDashboardProject } from "@/lib/db-projects";
+import { del, put } from "@vercel/blob";
+import { revalidatePath } from "next/cache";
+import {
+  createGalleryImageRecords,
+  getDashboardProject,
+  getNextGalleryImageSortOrder,
+} from "@/lib/db-projects";
 import {
   convertImageFileToAvif,
   MAX_GALLERY_IMAGE_SIZE,
@@ -15,6 +21,7 @@ export type ConvertGalleryImagesState = {
   convertedImages?: Array<
     Omit<ConvertedAvifImage, "buffer"> & {
       bufferBytes: number;
+      blobUrl?: string;
     }
   >;
   fieldErrors?: {
@@ -109,15 +116,64 @@ export async function convertGalleryImagesAction(
     };
   }
 
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+
+  if (!token) {
+    return {
+      message: "BLOB_READ_WRITE_TOKEN is not configured.",
+      status: "error",
+    };
+  }
+
   try {
+    const nextSortOrder = await getNextGalleryImageSortOrder(projectId);
     const convertedImages = await Promise.all(
-      files.map(async (file, index) => {
-        const convertedImage = await convertImageFileToAvif(
+      files.map((file, index) =>
+        convertImageFileToAvif(
           file,
           buildGalleryImagePathname({ file, index, projectId }),
-        );
+        ),
+      ),
+    );
+    const uploadedPathnames: string[] = [];
 
-        return {
+    try {
+      const uploadedImages = [];
+
+      for (let index = 0; index < convertedImages.length; index += 1) {
+        const convertedImage = convertedImages[index];
+        const blob = await put(convertedImage.pathname, convertedImage.buffer, {
+          access: "public",
+          allowOverwrite: true,
+          contentType: convertedImage.contentType,
+          token,
+        });
+
+        uploadedPathnames.push(blob.pathname);
+        uploadedImages.push({
+          altText: convertedImage.originalName,
+          blobContentType: blob.contentType ?? "image/avif",
+          blobDownloadUrl: blob.downloadUrl ?? null,
+          blobPathname: blob.pathname,
+          blobSize: convertedImage.outputSize,
+          blobUrl: blob.url,
+          height: convertedImage.height,
+          sortOrder: nextSortOrder + index,
+          width: convertedImage.width,
+        });
+      }
+
+      const createdImages = await createGalleryImageRecords({
+        images: uploadedImages,
+        projectId,
+      });
+
+      revalidatePath("/dashboard/projects");
+      revalidatePath(`/dashboard/projects/${projectId}/images`);
+      revalidatePath("/api/projects");
+
+      return {
+        convertedImages: convertedImages.map((convertedImage, index) => ({
           contentType: convertedImage.contentType,
           height: convertedImage.height,
           originalName: convertedImage.originalName,
@@ -125,22 +181,25 @@ export async function convertGalleryImagesAction(
           pathname: convertedImage.pathname,
           width: convertedImage.width,
           bufferBytes: convertedImage.buffer.byteLength,
-        };
-      }),
-    );
+          blobUrl: createdImages[index]?.blobUrl,
+        })),
+        message: `${createdImages.length} image${
+          createdImages.length === 1 ? "" : "s"
+        } converted, uploaded, and saved.`,
+        status: "success",
+      };
+    } catch (error) {
+      await Promise.allSettled(
+        uploadedPathnames.map((pathname) => del(pathname, { token })),
+      );
 
-    return {
-      convertedImages,
-      message: `${convertedImages.length} image${
-        convertedImages.length === 1 ? "" : "s"
-      } converted to AVIF. Blob upload and database storage are next.`,
-      status: "success",
-    };
+      throw error;
+    }
   } catch (error) {
-    console.error("Gallery image conversion error:", error);
+    console.error("Gallery image upload error:", error);
 
     return {
-      message: "Could not convert the selected images.",
+      message: "Could not upload the selected images.",
       status: "error",
     };
   }

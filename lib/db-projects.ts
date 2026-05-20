@@ -171,6 +171,86 @@ export async function getProjectImages(projectId: string) {
   return rows.map(mapProjectImage);
 }
 
+export async function getNextGalleryImageSortOrder(projectId: string) {
+  const rows = (await sql`
+    SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_sort_order
+    FROM project_images
+    WHERE project_id = ${projectId}
+      AND role = 'gallery'
+  `) as { next_sort_order: number | string }[];
+
+  return Number(rows[0]?.next_sort_order ?? 0);
+}
+
+export async function createGalleryImageRecords({
+  images,
+  projectId,
+}: {
+  images: Array<{
+    altText: string;
+    blobContentType: string;
+    blobDownloadUrl: string | null;
+    blobPathname: string;
+    blobSize: number;
+    blobUrl: string;
+    height: number | null;
+    sortOrder: number;
+    width: number | null;
+  }>;
+  projectId: string;
+}) {
+  const createdImages: ProjectImageRecord[] = [];
+
+  for (const image of images) {
+    const rows = (await sql`
+      INSERT INTO project_images (
+        project_id,
+        role,
+        blob_url,
+        blob_download_url,
+        blob_pathname,
+        blob_content_type,
+        blob_size,
+        width,
+        height,
+        alt_text,
+        sort_order
+      )
+      VALUES (
+        ${projectId},
+        'gallery',
+        ${image.blobUrl},
+        ${image.blobDownloadUrl},
+        ${image.blobPathname},
+        ${image.blobContentType},
+        ${image.blobSize},
+        ${image.width},
+        ${image.height},
+        ${image.altText},
+        ${image.sortOrder}
+      )
+      RETURNING
+        id,
+        project_id,
+        role,
+        blob_url,
+        blob_download_url,
+        blob_pathname,
+        blob_content_type,
+        blob_size,
+        width,
+        height,
+        alt_text,
+        sort_order,
+        created_at
+    `) as ProjectImageRow[];
+
+    createdImages.push(mapProjectImage(rows[0]));
+  }
+
+  return createdImages;
+}
+
 export async function getPublicProjects() {
   const rows = (await sql`
     SELECT

@@ -187,7 +187,7 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
         <section className="rounded-md border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
           <div className="border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
             <h3 className="text-base font-bold text-neutral-950 dark:text-white">
-              Converted AVIF output
+              Uploaded images
             </h3>
           </div>
           <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
@@ -199,6 +199,11 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
                 <p className="mt-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
                   {image.pathname}
                 </p>
+                {image.blobUrl && (
+                  <p className="mt-1 break-all text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                    {image.blobUrl}
+                  </p>
+                )}
                 <p className="mt-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
                   {image.width ?? "Unknown"} x {image.height ?? "Unknown"} ·{" "}
                   {formatBytes(image.outputSize)}
@@ -216,11 +221,11 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
           className="min-h-11 w-full px-5 sm:w-auto"
           variant={!hasImages || hasErrors || isPending ? "disabled" : "primary"}
         >
-          {isPending ? "Converting..." : "Convert images"}
+          {isPending ? "Uploading..." : "Upload images"}
         </DashboardButton>
         <p className="mt-3 text-xs leading-5 text-neutral-500 dark:text-neutral-400">
-          This step converts images to AVIF and prepares stable blob paths.
-          Upload and database storage are added in step 6.
+          Images are converted to AVIF, uploaded to Vercel Blob, and saved in
+          Neon Postgres.
         </p>
         {hasErrors && (
           <p className="mt-2 text-sm font-semibold text-red-600 dark:text-red-400">
