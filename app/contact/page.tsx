@@ -102,7 +102,7 @@ export default function Contact() {
         setErrors((prev) => ({ ...prev, [name]: updatedError }));
       }
     },
-    [errors]
+    [errors],
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,8 +135,8 @@ export default function Contact() {
   };
 
   return (
-    <article className="bg-white">
-      <section className="mx-auto max-w-7xl px-5 pb-20 pt-28 lg:px-8">
+    <article className="w-full bg-white">
+      <section className="mx-auto max-w-7xl px-5 pb-20 pt-12 sm:px-8 sm:pt-20">
         <motion.div
           className="mb-10 max-w-3xl select-text"
           initial="hidden"
@@ -156,20 +156,20 @@ export default function Contact() {
             className="max-w-2xl text-base leading-8 text-neutral-700 sm:text-lg"
             variants={revealUp}
           >
-            Vertel kort wat u wilt aanpakken. Ik reageer persoonlijk en denk
-            mee over de ruimte, de planning en de beste volgende stap.
+            Vertel kort wat u wilt aanpakken. Ik reageer persoonlijk en denk mee
+            over de ruimte, de planning en de beste volgende stap.
           </motion.p>
         </motion.div>
 
         <motion.div
-          className="grid overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl lg:grid-cols-[1fr_0.9fr]"
+          className="grid w-full grid-cols-1 overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl md:grid-cols-[1fr_1fr] lg:grid-cols-[1.2fr_0.8fr]"
           initial="hidden"
           animate="visible"
           variants={containerVariants}
         >
           <motion.form
             onSubmit={handleSubmit}
-            className="space-y-6 p-6 sm:p-8 lg:p-10"
+            className="space-y-6 p-6 sm:p-10"
             noValidate
             variants={revealUp}
           >
@@ -215,7 +215,9 @@ export default function Contact() {
             <Button
               type="submit"
               fullWidth
-              icon={<PaperAirplaneIcon className="h-5 w-5" aria-hidden="true" />}
+              icon={
+                <PaperAirplaneIcon className="h-5 w-5" aria-hidden="true" />
+              }
               variant="dark"
               disabled={isSubmitting}
             >
@@ -224,20 +226,22 @@ export default function Contact() {
           </motion.form>
 
           <motion.aside
-            className="relative min-h-[28rem] bg-neutral-950 text-white"
+            className="relative min-h-[28rem] bg-neutral-950 text-white sm:min-h-full"
             variants={revealRight}
           >
             <Image
               src="/assets/img/badkamer-contact.avif"
               alt="Badkamer renovatie"
               fill
-              sizes="(min-width: 1024px) 45vw, 100vw"
+              sizes="(min-width: 1024px) 45vw, (min-width: 640px) 50vw, 100vw"
               className="object-cover"
               priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
-            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-              <p className="eyebrow eyebrow-light mb-4">Wat u kunt verwachten</p>
+            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
+              <p className="eyebrow eyebrow-light mb-4">
+                Wat u kunt verwachten
+              </p>
               <div className="grid gap-3">
                 {contactPoints.map((point) => (
                   <div
