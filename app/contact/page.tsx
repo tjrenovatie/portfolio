@@ -4,6 +4,8 @@ import Image from "next/image";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { motion, type Variants } from "framer-motion";
 import { Button } from "@/components/button";
+import TextArea from "@/components/textArea";
+import TextInput from "@/components/textInput";
 
 interface FormData {
   name: string;
@@ -177,91 +179,38 @@ export default function Contact() {
               </p>
             )}
 
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-semibold text-neutral-900"
-              >
-                Naam
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                autoComplete="name"
-                aria-invalid={Boolean(errors.name)}
-                aria-describedby={errors.name ? "name-error" : undefined}
-                className={`mt-2 min-h-12 w-full rounded-md border bg-white px-4 text-neutral-900 outline-none transition focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary]/20 ${
-                  errors.name ? "border-red-500" : "border-neutral-300"
-                }`}
-              />
-              {errors.name && (
-                <p id="name-error" className="mt-2 text-sm text-red-600">
-                  {errors.name}
-                </p>
-              )}
-            </div>
+            <TextInput
+              type="text"
+              id="name"
+              name="name"
+              label="Naam"
+              value={formData.name}
+              onChange={handleChange}
+              autoComplete="name"
+              error={errors.name}
+            />
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold text-neutral-900"
-              >
-                E-mailadres
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                autoComplete="email"
-                aria-invalid={Boolean(errors.email)}
-                aria-describedby={errors.email ? "email-error" : undefined}
-                className={`mt-2 min-h-12 w-full rounded-md border bg-white px-4 text-neutral-900 outline-none transition focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary]/20 ${
-                  errors.email ? "border-red-500" : "border-neutral-300"
-                }`}
-              />
-              {errors.email && (
-                <p id="email-error" className="mt-2 text-sm text-red-600">
-                  {errors.email}
-                </p>
-              )}
-            </div>
+            <TextInput
+              type="email"
+              id="email"
+              name="email"
+              label="E-mailadres"
+              value={formData.email}
+              onChange={handleChange}
+              autoComplete="email"
+              error={errors.email}
+            />
 
-            <div>
-              <label
-                htmlFor="message"
-                className="block text-sm font-semibold text-neutral-900"
-              >
-                Bericht
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                rows={6}
-                value={formData.message}
-                onChange={handleChange}
-                aria-invalid={Boolean(errors.message)}
-                aria-describedby={
-                  errors.message ? "message-error" : "message-help"
-                }
-                className={`mt-2 w-full resize-y rounded-md border bg-white px-4 py-3 text-neutral-900 outline-none transition focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary]/20 ${
-                  errors.message ? "border-red-500" : "border-neutral-300"
-                }`}
-              />
-              <p id="message-help" className="mt-2 text-sm text-neutral-500">
-                Bijvoorbeeld: type ruimte, gewenste werkzaamheden en gewenste
-                periode.
-              </p>
-              {errors.message && (
-                <p id="message-error" className="mt-2 text-sm text-red-600">
-                  {errors.message}
-                </p>
-              )}
-            </div>
+            <TextArea
+              id="message"
+              name="message"
+              label="Bericht"
+              rows={6}
+              value={formData.message}
+              onChange={handleChange}
+              error={errors.message}
+              helperText="Bijvoorbeeld: type ruimte, gewenste werkzaamheden en gewenste periode."
+            />
 
             <Button
               type="submit"
