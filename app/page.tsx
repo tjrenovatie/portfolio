@@ -30,10 +30,11 @@ const Home = () => {
     >
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black opacity-30"
+        className="absolute inset-0 bg-black/55"
         role="img"
         aria-label="Decorative background overlay for styling purposes"
-      ></div>
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
 
       {/* Logo Section */}
 
@@ -55,11 +56,11 @@ const Home = () => {
           </div>
         </div>
         <div className="landing-description flex justify-center">
-          <h4 className="text-center font-light">
+          <h1 className="text-center text-xl font-light text-white sm:text-2xl">
             Voor ontwerp, advies, verbouwing en renovatie.
             <br />
             Komt goed!
-          </h4>
+          </h1>
         </div>
 
         {/* Navigation Links */}
