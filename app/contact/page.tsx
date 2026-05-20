@@ -185,7 +185,7 @@ export default function Contact() {
         {/* Image */}
         <div className="w-full h-full relative">
           <Image
-            src="/assets/img/badkamer-contact.png"
+            src="/assets/img/badkamer-contact.avif"
             alt="Contact"
             width={800}
             height={600}

@@ -6,10 +6,24 @@ import { projects } from "@/lib/projects";
 export const dynamic = "force-static";
 export const revalidate = 86_400;
 
+function emptyProjectImageData() {
+  const result: Record<string, string[]> = {};
+
+  projects.forEach((project) => {
+    result[project.blobPrefix] = [];
+  });
+
+  return result;
+}
+
+function isMissingBlobStoreError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes("store does not exist");
+}
+
 export async function GET() {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   if (!token) {
-    return NextResponse.json({ error: "Missing token" }, { status: 500 });
+    return NextResponse.json({ data: emptyProjectImageData() });
   }
 
   try {
@@ -33,11 +47,7 @@ export async function GET() {
     }
 
     // Group by project prefix in memory
-    const result: Record<string, string[]> = {};
-
-    projects.forEach((project) => {
-      result[project.blobPrefix] = [];
-    });
+    const result = emptyProjectImageData();
 
     allBlobs.forEach((blob) => {
       for (const project of projects) {
@@ -58,6 +68,10 @@ export async function GET() {
     );
     return response;
   } catch (error) {
+    if (isMissingBlobStoreError(error)) {
+      return NextResponse.json({ data: emptyProjectImageData() });
+    }
+
     console.error("Blob list error:", error);
     return NextResponse.json(
       { error: "Failed to fetch images" },

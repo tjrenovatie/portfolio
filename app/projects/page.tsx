@@ -39,7 +39,7 @@ function ProjectCard({ project }: { project: (typeof projects)[number] }) {
     >
       <BlobImage
         blobPrefix={project.blobPrefix}
-        fallbackSrc="/fallback.jpg"
+        fallbackSrc="/fallback.avif"
         alt={project.title}
         width={CARD_WIDTH}
         height={Math.round(height)}

@@ -10,7 +10,7 @@ const About = () => {
         <div className="relative w-full h-[50vh] sm:h-[30vh] md:h-[40vh] lg:h-[50vh] rounded-lg overflow-hidden">
           <BlobImage
             blobPrefix="profile/profile-image"
-            fallbackSrc="/assets/img/profile/1.webp"
+            fallbackSrc="/assets/img/profile/profile-image.avif"
             alt="Thurston Joseph"
             fill
             className="profile-image"
