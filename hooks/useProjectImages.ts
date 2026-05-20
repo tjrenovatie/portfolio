@@ -8,18 +8,19 @@ interface ProjectImageCache {
 }
 
 export function useProjectImages(prefix: string | null) {
-  const [images, setImages] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [imageCache, setImageCache] = useState<Record<string, string[]>>({});
+  const [error, setError] = useState<{
+    message: string;
+    prefix: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!prefix) {
-      setImages([]);
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
+    let ignore = false;
+
     fetch("/api/project-images/all", { next: { revalidate: 86400 } })
       .then((res) => {
         if (!res.ok) {
@@ -29,11 +30,30 @@ export function useProjectImages(prefix: string | null) {
         return res.json();
       })
       .then(({ data }: { data: ProjectImageCache["data"] }) => {
-        setImages(data[prefix] || []);
+        if (ignore) return;
+
+        setImageCache((currentCache) => ({
+          ...currentCache,
+          [prefix]: data[prefix] || [],
+        }));
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (ignore) return;
+
+        setError({ message: err.message, prefix });
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, [prefix]);
 
-  return { images, loading, error };
+  const hasCachedImages = Boolean(prefix && prefix in imageCache);
+  const currentError = error?.prefix === prefix ? error.message : null;
+
+  return {
+    images: prefix ? imageCache[prefix] ?? [] : [],
+    loading: Boolean(prefix && !hasCachedImages && !currentError),
+    error: currentError,
+  };
 }
