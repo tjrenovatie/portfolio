@@ -1,6 +1,11 @@
 import Image from "next/image";
 import { ButtonLink } from "@/components/button";
-import { MotionDiv, MotionH1, MotionP } from "@/components/motion";
+import {
+  MotionDiv,
+  MotionH1,
+  MotionP,
+  MotionSection,
+} from "@/components/motion";
 import { getFirstBlobUrl } from "@/lib/vercel-blob";
 
 const contactHighlights = [
@@ -43,10 +48,23 @@ const revealRight = {
   },
 };
 
+const contactSectionVariants = {
+  hidden: { opacity: 0, y: 96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 2,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.12,
+    },
+  },
+};
+
 const About = async () => {
   const profileSrc = await getFirstBlobUrl(
     "profile/profile-image",
-    "/assets/img/profile/profile-image.avif"
+    "/assets/img/profile/profile-image.avif",
   );
 
   return (
@@ -115,13 +133,16 @@ const About = async () => {
         </MotionDiv>
       </section>
 
-      <section className="bg-neutral-50 px-5 py-16 lg:px-8">
+      <MotionSection
+        className="bg-neutral-50 px-5 py-16 lg:px-8"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.45 }}
+        variants={contactSectionVariants}
+      >
         <MotionDiv
           className="mx-auto grid max-w-7xl overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-lg md:grid-cols-[1.1fr_0.9fr]"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          variants={revealUp}
         >
           <div className="p-6 sm:p-8 lg:p-10">
             <p className="eyebrow mb-4">Contact</p>
@@ -164,7 +185,7 @@ const About = async () => {
             </div>
           </div>
         </MotionDiv>
-      </section>
+      </MotionSection>
     </article>
   );
 };
