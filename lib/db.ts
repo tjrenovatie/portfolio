@@ -14,6 +14,8 @@ export type ProjectRecord = {
   slug: string;
   description: string;
   thumbnailImageId: string | null;
+  thumbnailUrl: string | null;
+  thumbnailPathname: string | null;
   createdAt: Date;
   updatedAt: Date;
 };

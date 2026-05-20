@@ -6,6 +6,8 @@ type ProjectRow = {
   slug: string;
   description: string;
   thumbnail_image_id: string | null;
+  thumbnail_url: string | null;
+  thumbnail_pathname: string | null;
   created_at: Date;
   updated_at: Date;
 };
@@ -33,6 +35,8 @@ function mapProject(row: ProjectRow): ProjectRecord {
     slug: row.slug,
     description: row.description,
     thumbnailImageId: row.thumbnail_image_id,
+    thumbnailUrl: row.thumbnail_url,
+    thumbnailPathname: row.thumbnail_pathname,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -59,15 +63,19 @@ function mapProjectImage(row: ProjectImageRow): ProjectImageRecord {
 export async function getDashboardProjects() {
   const rows = (await sql`
     SELECT
-      id,
-      name,
-      slug,
-      description,
-      thumbnail_image_id,
-      created_at,
-      updated_at
+      projects.id,
+      projects.name,
+      projects.slug,
+      projects.description,
+      projects.thumbnail_image_id,
+      project_images.blob_url AS thumbnail_url,
+      project_images.blob_pathname AS thumbnail_pathname,
+      projects.created_at,
+      projects.updated_at
     FROM projects
-    ORDER BY created_at DESC
+    LEFT JOIN project_images
+      ON project_images.id = projects.thumbnail_image_id
+    ORDER BY projects.created_at DESC
   `) as ProjectRow[];
 
   return rows.map(mapProject);

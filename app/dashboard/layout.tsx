@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   ChartBarIcon,
   ChevronLeftIcon,
@@ -70,6 +70,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     : "border-neutral-300 bg-white text-neutral-800 hover:border-[--color-primary] hover:text-[--color-secondary]";
   const sidebarWidthClasses = isSidebarCollapsed ? "w-20" : "w-64";
   const contentOffsetClasses = isSidebarCollapsed ? "lg:pl-20" : "lg:pl-64";
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDarkMode);
+
+    return () => {
+      document.documentElement.classList.remove("dark");
+    };
+  }, [isDarkMode]);
 
   return (
     <main
