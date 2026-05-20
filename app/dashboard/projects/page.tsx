@@ -2,6 +2,7 @@ import { getDashboardProjects } from "@/lib/db-projects";
 import NewProjectDialog from "./NewProjectDialog";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 function formatDate(value: Date) {
   return new Intl.DateTimeFormat("nl-NL", {

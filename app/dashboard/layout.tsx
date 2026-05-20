@@ -19,7 +19,11 @@ const navigation = [
   { name: "Overview", href: "/dashboard", icon: ChartBarIcon },
   { name: "Projects", href: "/dashboard/projects", icon: FolderIcon },
   { name: "Images", href: "/dashboard/images", icon: PhotoIcon },
-  { name: "Settings", href: "/dashboard/settings", icon: WrenchScrewdriverIcon },
+  {
+    name: "Settings",
+    href: "/dashboard/settings",
+    icon: WrenchScrewdriverIcon,
+  },
 ];
 
 function subscribeToColorScheme(callback: () => void) {
@@ -188,7 +192,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               className={`inline-flex h-10 w-10 items-center justify-center rounded-md border transition-colors ${iconButtonClasses}`}
             >
               {isDarkMode ? (
-                <SunIcon className="h-5 w-5 text-amber-300" aria-hidden="true" />
+                <SunIcon
+                  className="h-5 w-5 text-amber-300"
+                  aria-hidden="true"
+                />
               ) : (
                 <MoonIcon className="h-5 w-5" aria-hidden="true" />
               )}

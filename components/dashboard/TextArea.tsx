@@ -1,33 +1,28 @@
 import type { TextareaHTMLAttributes } from "react";
+import TextArea from "@/components/textArea";
 
 type DashboardTextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  error?: string;
   label: string;
 };
 
 export function DashboardTextArea({
   className,
-  id,
-  label,
+  error,
   ...props
 }: DashboardTextAreaProps) {
   return (
-    <div>
-      <label
-        htmlFor={id}
-        className="block text-sm font-semibold text-neutral-900 dark:text-white"
-      >
-        {label}
-      </label>
-      <textarea
-        id={id}
-        className={[
-          "mt-2 w-full resize-y rounded-md border border-neutral-300 bg-white px-4 py-3 text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-[--color-primary] focus:ring-2 focus:ring-[--color-primary]/20 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white dark:placeholder:text-neutral-500 dark:focus:border-[--color-primary] dark:focus:ring-[--color-primary]/30",
-          className ?? "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        {...props}
-      />
-    </div>
+    <TextArea
+      error={error}
+      labelClassName="dark:text-white"
+      className={[
+        "dark:border-neutral-700 dark:bg-neutral-950 dark:text-white dark:placeholder:text-neutral-500 dark:focus:border-[--color-primary] dark:focus:ring-[--color-primary]/30",
+        error ? "dark:border-red-500" : "",
+        className ?? "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      {...props}
+    />
   );
 }

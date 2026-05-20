@@ -104,3 +104,123 @@ export async function getProjectImages(projectId: string) {
 
   return rows.map(mapProjectImage);
 }
+
+export async function projectSlugExists(slug: string) {
+  const rows = (await sql`
+    SELECT 1
+    FROM projects
+    WHERE slug = ${slug}
+    LIMIT 1
+  `) as { "?column?": number }[];
+
+  return rows.length > 0;
+}
+
+export async function createProjectRecord({
+  description,
+  name,
+  slug,
+}: {
+  description: string;
+  name: string;
+  slug: string;
+}) {
+  const rows = (await sql`
+    INSERT INTO projects (name, slug, description)
+    VALUES (${name}, ${slug}, ${description})
+    RETURNING
+      id,
+      name,
+      slug,
+      description,
+      thumbnail_image_id,
+      NULL AS thumbnail_url,
+      NULL AS thumbnail_pathname,
+      created_at,
+      updated_at
+  `) as ProjectRow[];
+
+  return mapProject(rows[0]);
+}
+
+export async function deleteProjectRecord(projectId: string) {
+  await sql`
+    DELETE FROM projects
+    WHERE id = ${projectId}
+  `;
+}
+
+export async function createProjectThumbnailRecord({
+  altText,
+  blobContentType,
+  blobDownloadUrl,
+  blobPathname,
+  blobSize,
+  blobUrl,
+  height,
+  projectId,
+  width,
+}: {
+  altText: string;
+  blobContentType: string;
+  blobDownloadUrl: string | null;
+  blobPathname: string;
+  blobSize: number;
+  blobUrl: string;
+  height: number | null;
+  projectId: string;
+  width: number | null;
+}) {
+  const rows = (await sql`
+    INSERT INTO project_images (
+      project_id,
+      role,
+      blob_url,
+      blob_download_url,
+      blob_pathname,
+      blob_content_type,
+      blob_size,
+      width,
+      height,
+      alt_text,
+      sort_order
+    )
+    VALUES (
+      ${projectId},
+      'thumbnail',
+      ${blobUrl},
+      ${blobDownloadUrl},
+      ${blobPathname},
+      ${blobContentType},
+      ${blobSize},
+      ${width},
+      ${height},
+      ${altText},
+      0
+    )
+    RETURNING
+      id,
+      project_id,
+      role,
+      blob_url,
+      blob_download_url,
+      blob_pathname,
+      blob_content_type,
+      blob_size,
+      width,
+      height,
+      alt_text,
+      sort_order,
+      created_at
+  `) as ProjectImageRow[];
+
+  const image = mapProjectImage(rows[0]);
+
+  await sql`
+    UPDATE projects
+    SET thumbnail_image_id = ${image.id}
+    WHERE id = ${projectId}
+  `;
+
+  return image;
+}
