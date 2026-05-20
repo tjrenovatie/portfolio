@@ -51,7 +51,7 @@ const About = async () => {
 
   return (
     <article className="bg-white text-neutral-900">
-      <section className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-center gap-10 px-5 pb-20 pt-28 md:grid-cols-[1.05fr_0.95fr] lg:px-8">
+      <section className="mx-auto grid max-w-7xl items-start gap-10 px-5 py-12 md:grid-cols-[1.05fr_0.95fr] md:py-14 lg:items-center lg:px-8 lg:py-16">
         <MotionDiv
           className="max-w-2xl select-text"
           initial="hidden"
@@ -84,13 +84,7 @@ const About = async () => {
             afspraken, vakmanschap en een resultaat dat netjes wordt opgeleverd.
           </MotionP>
 
-          <MotionDiv
-            className="flex flex-col gap-3 sm:flex-row"
-            variants={revealUp}
-          >
-            <ButtonLink href="/contact" variant="dark">
-              Bespreek uw project
-            </ButtonLink>
+          <MotionDiv className="flex" variants={revealUp}>
             <ButtonLink href="/projects" variant="secondary">
               Bekijk projecten
             </ButtonLink>
