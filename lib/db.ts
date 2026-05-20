@@ -35,3 +35,25 @@ export type ProjectImageRecord = {
   sortOrder: number;
   createdAt: Date;
 };
+
+export type PublicProjectImage = Pick<
+  ProjectImageRecord,
+  | "id"
+  | "role"
+  | "blobUrl"
+  | "blobDownloadUrl"
+  | "blobPathname"
+  | "blobContentType"
+  | "blobSize"
+  | "width"
+  | "height"
+  | "altText"
+  | "sortOrder"
+  | "createdAt"
+>;
+
+export type PublicProject = ProjectRecord & {
+  images: PublicProjectImage[];
+  imageUrls: string[];
+  thumbnail: PublicProjectImage | null;
+};

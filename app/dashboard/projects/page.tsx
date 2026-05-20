@@ -1,4 +1,5 @@
 import { getDashboardProjects } from "@/lib/db-projects";
+import { DashboardButtonLink } from "@/components/dashboard";
 import NewProjectDialog from "./NewProjectDialog";
 
 export const dynamic = "force-dynamic";
@@ -89,13 +90,22 @@ export default async function DashboardProjectsPage() {
                   </p>
                 </div>
 
-                <div className="text-left md:text-right">
+                <div className="grid gap-3 text-left md:justify-items-end md:text-right">
                   <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">
                     Updated {formatDate(project.updatedAt)}
                   </p>
                   <p className="mt-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                    {project.thumbnailImageId ? "Thumbnail linked" : "No thumbnail"}
+                    {project.thumbnailImageId
+                      ? "Thumbnail linked"
+                      : "No thumbnail"}
                   </p>
+                  <DashboardButtonLink
+                    href={`/dashboard/projects/${project.id}/images`}
+                    variant="secondary"
+                    className="min-h-10 px-4"
+                  >
+                    Manage images
+                  </DashboardButtonLink>
                 </div>
               </div>
             ))}

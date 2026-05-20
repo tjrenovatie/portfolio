@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type DashboardButtonVariant = "primary" | "secondary" | "ghost" | "disabled";
@@ -6,6 +7,14 @@ type DashboardButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
   icon?: ReactNode;
   variant?: DashboardButtonVariant;
+};
+
+type DashboardButtonLinkProps = {
+  children: ReactNode;
+  className?: string;
+  href: string;
+  icon?: ReactNode;
+  variant?: Exclude<DashboardButtonVariant, "disabled">;
 };
 
 const baseClasses =
@@ -46,5 +55,30 @@ export function DashboardButton({
       {icon}
       {children}
     </button>
+  );
+}
+
+export function DashboardButtonLink({
+  children,
+  className,
+  href,
+  icon,
+  variant = "primary",
+}: DashboardButtonLinkProps) {
+  return (
+    <Link
+      href={href}
+      className={[
+        baseClasses,
+        className?.includes("rounded-") ? "" : "rounded-md",
+        variantClasses[variant],
+        className ?? "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {icon}
+      {children}
+    </Link>
   );
 }
