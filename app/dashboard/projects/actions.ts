@@ -24,10 +24,6 @@ export type CreateProjectState = {
   status: "idle" | "error" | "success";
 };
 
-export const initialCreateProjectState: CreateProjectState = {
-  status: "idle",
-};
-
 function getStringField(formData: FormData, key: string) {
   const value = formData.get(key);
 

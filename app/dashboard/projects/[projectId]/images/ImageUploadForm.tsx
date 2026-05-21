@@ -8,8 +8,12 @@ import {
 } from "@/components/dashboard";
 import {
   convertGalleryImagesAction,
-  initialConvertGalleryImagesState,
+  type ConvertGalleryImagesState,
 } from "./actions";
+
+const initialConvertGalleryImagesState: ConvertGalleryImagesState = {
+  status: "idle",
+};
 
 const MAX_IMAGE_SIZE = 15 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set([
@@ -58,7 +62,7 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
   const hasErrors = invalidCount > 0;
 
   return (
-    <form action={formAction} className="space-y-6" encType="multipart/form-data">
+    <form action={formAction} className="space-y-6">
       <DashboardFileInput
         id="project-gallery-images"
         name="images"

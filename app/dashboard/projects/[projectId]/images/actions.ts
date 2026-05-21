@@ -35,10 +35,6 @@ export type ConvertGalleryImagesState = {
   status: "idle" | "error" | "success";
 };
 
-export const initialConvertGalleryImagesState: ConvertGalleryImagesState = {
-  status: "idle",
-};
-
 function getImageFiles(formData: FormData) {
   return formData
     .getAll("images")

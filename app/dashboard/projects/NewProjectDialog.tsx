@@ -9,10 +9,11 @@ import {
   DashboardTextArea,
   DashboardTextInput,
 } from "@/components/dashboard";
-import {
-  createProjectAction,
-  initialCreateProjectState,
-} from "./actions";
+import { createProjectAction, type CreateProjectState } from "./actions";
+
+const initialCreateProjectState: CreateProjectState = {
+  status: "idle",
+};
 
 export default function NewProjectDialog() {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +50,6 @@ export default function NewProjectDialog() {
           ref={formRef}
           action={formAction}
           className="grid max-h-[calc(100dvh-10rem)] gap-6 overflow-y-auto bg-neutral-50 p-5 dark:bg-neutral-950 lg:grid-cols-[1fr_20rem]"
-          encType="multipart/form-data"
         >
           {state.message && (
             <div
