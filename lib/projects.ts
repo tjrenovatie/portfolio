@@ -6,7 +6,6 @@ export interface Project {
   repAspect: number;
   blobPrefix?: string;
   imageUrls?: string[];
-  thumbnailUrl?: string | null;
 }
 
 export const projects = [

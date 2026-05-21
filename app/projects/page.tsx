@@ -3,19 +3,15 @@ import { getPublicProjects } from "@/lib/db-projects";
 import { projects as fallbackProjects, type Project } from "@/lib/projects";
 import ProjectsClientWrapper from "./ProjectsClientWrapper";
 
-const ROW_HEIGHT = 10;
-const CARD_GAP = 16;
 const CARD_WIDTH = 300;
-/** [grid-auto-rows:10px] */
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 function getRepresentativeAspect(project: {
   images: Array<{ height: number | null; width: number | null }>;
-  thumbnail: { height: number | null; width: number | null } | null;
 }) {
-  const representativeImage = project.thumbnail ?? project.images[0];
+  const representativeImage = project.images[0];
 
   if (!representativeImage?.width || !representativeImage.height) {
     return 1.33;
@@ -37,7 +33,6 @@ async function getProjects() {
       title: project.name,
       repAspect: getRepresentativeAspect(project),
       imageUrls: project.imageUrls,
-      thumbnailUrl: project.thumbnailUrl,
     }));
   } catch (error) {
     console.error("Failed to load database projects:", error);
@@ -50,11 +45,21 @@ export default async function ProjectsPage() {
   const projects = await getProjects();
 
   return (
-    <article className="min-h-screen w-full text-[--color-primary-title] p-5">
+    <article className="min-h-screen w-full bg-neutral-50 px-5 py-10 text-[--color-primary-title]">
       <div className="container mx-auto mb-10">
-        <h1 className="text-4xl font-bold text-center mb-10">Onze Projecten</h1>
+        <header className="mx-auto mb-10 max-w-3xl text-center">
+          <span className="eyebrow">Portfolio</span>
+          <h1 className="mt-3 text-4xl font-bold">Onze Projecten</h1>
+          <p className="mt-4 text-base leading-7 text-neutral-600 sm:text-lg">
+            Een selectie van afgeronde renovaties, badkamers, keukens en
+            interieurs.
+          </p>
+        </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 [grid-auto-rows:2rem]">
+        <div
+          className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4"
+          data-project-gallery
+        >
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
@@ -67,44 +72,52 @@ export default async function ProjectsPage() {
 }
 
 function ProjectCard({ project }: { project: Project }) {
-  const height = CARD_WIDTH / project.repAspect;
-  const span = Math.ceil((height + CARD_GAP) / (ROW_HEIGHT + CARD_GAP));
+  const safeAspect = Math.max(0.65, Math.min(project.repAspect, 1.9));
+  const height = Math.round(CARD_WIDTH / safeAspect);
+  const previewUrl = project.imageUrls?.find((url) => url.trim().length > 0);
 
   return (
-    <div
-      className="group relative overflow-hidden rounded-sm shadow-md hover:shadow-xl transition-shadow cursor-pointer"
-      style={{ gridRowEnd: `span ${span}` }}
+    <figure
+      className="group relative mb-4 break-inside-avoid overflow-hidden rounded-md bg-neutral-200 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
       data-project-id={project.id}
     >
-      {project.thumbnailUrl ? (
+      <div
+        className="relative w-full cursor-pointer overflow-hidden"
+        style={{ aspectRatio: `${safeAspect} / 1` }}
+      >
+        {previewUrl ? (
         // Database project images come from Vercel Blob URLs that are not known
         // at build time, so render the stored public URL directly.
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={project.thumbnailUrl}
+          src={previewUrl}
           alt={project.title}
           width={CARD_WIDTH}
-          height={Math.round(height)}
-          className="w-full h-full object-cover"
+          height={height}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
-      ) : project.blobPrefix ? (
+        ) : project.blobPrefix ? (
         <BlobImage
           blobPrefix={project.blobPrefix}
           fallbackSrc="/fallback.avif"
           alt={project.title}
           width={CARD_WIDTH}
-          height={Math.round(height)}
-          className="w-full h-full object-cover"
+          height={height}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           priority
         />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center bg-neutral-200 text-sm font-semibold text-neutral-500">
-          No image
-        </div>
-      )}
-      <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-        <p className="p-3 text-white font-medium">{project.title}</p>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-neutral-200 text-sm font-semibold text-neutral-500">
+            No image
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent opacity-80 transition-opacity group-hover:opacity-95" />
       </div>
-    </div>
+      <figcaption className="absolute inset-x-0 bottom-0 p-4">
+        <h2 className="text-lg font-bold leading-tight text-white drop-shadow-sm">
+          {project.title}
+        </h2>
+      </figcaption>
+    </figure>
   );
 }

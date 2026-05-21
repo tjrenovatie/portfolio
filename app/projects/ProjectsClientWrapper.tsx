@@ -26,10 +26,22 @@ export default function ProjectsClientWrapper({
   // Event delegation voor clicks op server-gerenderde cards
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      const card = (e.target as HTMLElement).closest("[data-project-id]");
-      if (!card) return;
+      const target = e.target as HTMLElement;
+
+      if (target.closest("a, button")) {
+        return;
+      }
+
+      const gallery = document.querySelector("[data-project-gallery]");
+      const card = target.closest("[data-project-id]");
+
+      if (!gallery || !card || !gallery.contains(card)) {
+        return;
+      }
+
       const id = card.getAttribute("data-project-id");
       const project = projects.find((p) => p.id === id);
+
       if (project) openModal(project);
     };
 
