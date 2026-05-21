@@ -6,6 +6,8 @@ import {
   createProjectRecord,
   createProjectThumbnailRecord,
   deleteProjectRecord,
+  getDashboardProject,
+  getProjectImages,
   projectSlugExists,
 } from "@/lib/db-projects";
 import {
@@ -21,6 +23,11 @@ export type CreateProjectState = {
     name?: string;
     thumbnail?: string;
   };
+  message?: string;
+  status: "idle" | "error" | "success";
+};
+
+export type DeleteProjectState = {
   message?: string;
   status: "idle" | "error" | "success";
 };
@@ -189,6 +196,58 @@ export async function createProjectAction(
 
     return {
       message: "Could not create the project. Try again later.",
+      status: "error",
+    };
+  }
+}
+
+export async function deleteProjectAction(
+  projectId: string,
+  _previousState: DeleteProjectState,
+): Promise<DeleteProjectState> {
+  const project = await getDashboardProject(projectId);
+
+  if (!project) {
+    return {
+      message: "Project not found.",
+      status: "error",
+    };
+  }
+
+  const images = await getProjectImages(projectId);
+  const blobPathnames = images.map((image) => image.blobPathname);
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+
+  if (blobPathnames.length > 0 && !token) {
+    return {
+      message: "BLOB_READ_WRITE_TOKEN is not configured.",
+      status: "error",
+    };
+  }
+
+  try {
+    if (token) {
+      await Promise.all(
+        blobPathnames.map((pathname) => del(pathname, { token })),
+      );
+    }
+
+    await deleteProjectRecord(projectId);
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/projects");
+    revalidatePath("/projects");
+    revalidatePath("/api/projects");
+
+    return {
+      message: "Project deleted.",
+      status: "success",
+    };
+  } catch (error) {
+    console.error("Delete project error:", error);
+
+    return {
+      message: "Could not delete the project. Try again later.",
       status: "error",
     };
   }

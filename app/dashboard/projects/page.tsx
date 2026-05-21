@@ -1,17 +1,11 @@
 import { getDashboardProjects } from "@/lib/db-projects";
+import { PencilIcon } from "@heroicons/react/24/outline";
 import { DashboardButtonLink } from "@/components/dashboard";
+import DeleteProjectButton from "./DeleteProjectButton";
 import NewProjectDialog from "./NewProjectDialog";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function formatDate(value: Date) {
-  return new Intl.DateTimeFormat("nl-NL", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
-}
 
 export default async function DashboardProjectsPage() {
   const projects = await getDashboardProjects();
@@ -90,22 +84,19 @@ export default async function DashboardProjectsPage() {
                   </p>
                 </div>
 
-                <div className="grid gap-3 text-left md:justify-items-end md:text-right">
-                  <p className="text-sm font-semibold text-neutral-700 dark:text-neutral-200">
-                    Updated {formatDate(project.updatedAt)}
-                  </p>
-                  <p className="mt-1 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                    {project.thumbnailImageId
-                      ? "Thumbnail linked"
-                      : "No thumbnail"}
-                  </p>
+                <div className="flex items-center gap-2 md:justify-end">
                   <DashboardButtonLink
                     href={`/dashboard/projects/${project.id}/images`}
                     variant="secondary"
-                    className="min-h-10 px-4"
+                    className="h-10 w-10 !gap-0 !p-0"
+                    aria-label={`Manage ${project.name}`}
                   >
-                    Manage images
+                    <PencilIcon className="h-4 w-4" aria-hidden="true" />
                   </DashboardButtonLink>
+                  <DeleteProjectButton
+                    projectId={project.id}
+                    projectName={project.name}
+                  />
                 </div>
               </div>
             ))}
