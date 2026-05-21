@@ -5,6 +5,7 @@ import {
   getProjectImages,
 } from "@/lib/db-projects";
 import { DashboardButtonLink } from "@/components/dashboard";
+import GalleryImageList from "./GalleryImageList";
 import ImageUploadForm from "./ImageUploadForm";
 
 export const dynamic = "force-dynamic";
@@ -48,8 +49,8 @@ export default async function ProjectImagesPage({
             {project.name}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-600 dark:text-neutral-300">
-            Select gallery images for this project. Validation happens before
-            the upload pipeline is connected.
+            Upload gallery images and manage the display order for the public
+            project gallery.
           </p>
         </div>
 
@@ -62,6 +63,8 @@ export default async function ProjectImagesPage({
           </p>
         </div>
       </section>
+
+      <GalleryImageList images={galleryImages} projectId={project.id} />
 
       <ImageUploadForm projectId={project.id} />
     </article>

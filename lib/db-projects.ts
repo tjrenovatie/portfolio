@@ -255,6 +255,51 @@ export async function createGalleryImageRecords({
   return createdImages;
 }
 
+export async function reorderGalleryImage({
+  direction,
+  imageId,
+  projectId,
+}: {
+  direction: "down" | "up";
+  imageId: string;
+  projectId: string;
+}) {
+  const rows = (await sql`
+    SELECT id
+    FROM project_images
+    WHERE project_id = ${projectId}
+      AND role = 'gallery'
+    ORDER BY sort_order ASC, created_at ASC
+  `) as { id: string }[];
+
+  const currentIndex = rows.findIndex((row) => row.id === imageId);
+
+  if (currentIndex === -1) {
+    return false;
+  }
+
+  const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+
+  if (nextIndex < 0 || nextIndex >= rows.length) {
+    return false;
+  }
+
+  const orderedImageIds = rows.map((row) => row.id);
+  const [imageToMove] = orderedImageIds.splice(currentIndex, 1);
+  orderedImageIds.splice(nextIndex, 0, imageToMove);
+
+  for (const [sortOrder, orderedImageId] of orderedImageIds.entries()) {
+    await sql`
+      UPDATE project_images
+      SET sort_order = ${sortOrder}
+      WHERE id = ${orderedImageId}
+        AND sort_order IS DISTINCT FROM ${sortOrder}
+    `;
+  }
+
+  return true;
+}
+
 export async function getPublicProjects() {
   const rows = (await sql`
     SELECT

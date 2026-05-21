@@ -6,6 +6,7 @@ import {
   createGalleryImageRecords,
   getDashboardProject,
   getNextGalleryImageSortOrder,
+  reorderGalleryImage,
 } from "@/lib/db-projects";
 import {
   convertImageFileToAvif,
@@ -34,6 +35,11 @@ export type ConvertGalleryImagesState = {
   }>;
   message?: string;
   status: "idle" | "error" | "success";
+};
+
+export type ReorderGalleryImageState = {
+  message?: string;
+  status: "error" | "success";
 };
 
 function getImageFiles(formData: FormData) {
@@ -170,6 +176,7 @@ export async function convertGalleryImagesAction(
 
       revalidatePath("/dashboard/projects");
       revalidatePath(`/dashboard/projects/${projectId}/images`);
+      revalidatePath("/projects");
       revalidatePath("/api/projects");
 
       return {
@@ -200,6 +207,52 @@ export async function convertGalleryImagesAction(
 
     return {
       message: "Could not upload the selected images.",
+      status: "error",
+    };
+  }
+}
+
+export async function reorderGalleryImageAction(
+  projectId: string,
+  imageId: string,
+  direction: "down" | "up",
+): Promise<ReorderGalleryImageState> {
+  const project = await getDashboardProject(projectId);
+
+  if (!project) {
+    return {
+      message: "Project not found.",
+      status: "error",
+    };
+  }
+
+  try {
+    const didReorder = await reorderGalleryImage({
+      direction,
+      imageId,
+      projectId,
+    });
+
+    if (!didReorder) {
+      return {
+        message: "Image could not be moved.",
+        status: "error",
+      };
+    }
+
+    revalidatePath(`/dashboard/projects/${projectId}/images`);
+    revalidatePath("/projects");
+    revalidatePath("/api/projects");
+
+    return {
+      message: "Image order updated.",
+      status: "success",
+    };
+  } catch (error) {
+    console.error("Reorder gallery image error:", error);
+
+    return {
+      message: "Could not update the image order. Try again later.",
       status: "error",
     };
   }
