@@ -13,6 +13,7 @@ import {
   MAX_THUMBNAIL_IMAGE_SIZE,
   validateUploadImage,
 } from "@/lib/image-processing";
+import { getProjectThumbnailBlobPath } from "@/lib/blob-paths";
 
 export type CreateProjectState = {
   fieldErrors?: {
@@ -135,7 +136,7 @@ export async function createProjectAction(
     const slug = await createUniqueSlug(name);
     const project = await createProjectRecord({ description, name, slug });
     projectId = project.id;
-    blobPathname = `projects/${project.id}/thumbnail.avif`;
+    blobPathname = getProjectThumbnailBlobPath(project.id);
     const thumbnailImage = await convertImageFileToAvif(
       thumbnail,
       blobPathname,

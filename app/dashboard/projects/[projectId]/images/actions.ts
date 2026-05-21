@@ -14,6 +14,7 @@ import {
   validateUploadImage,
   type ConvertedAvifImage,
 } from "@/lib/image-processing";
+import { getProjectGalleryBlobPath } from "@/lib/blob-paths";
 
 const MAX_GALLERY_FILES = 20;
 
@@ -51,9 +52,12 @@ function buildGalleryImagePathname({
   projectId: string;
 }) {
   const normalizedName = normalizeImageFileName(file.name);
-  const paddedIndex = String(index + 1).padStart(2, "0");
 
-  return `projects/${projectId}/images/${paddedIndex}-${normalizedName}.avif`;
+  return getProjectGalleryBlobPath({
+    fileName: normalizedName,
+    index,
+    projectId,
+  });
 }
 
 export async function convertGalleryImagesAction(
