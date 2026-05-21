@@ -9,6 +9,7 @@ import {
   getDashboardProject,
   getProjectImages,
   projectSlugExists,
+  updateProjectRecord,
 } from "@/lib/db-projects";
 import {
   convertImageFileToAvif,
@@ -30,6 +31,17 @@ export type CreateProjectState = {
 export type DeleteProjectState = {
   message?: string;
   status: "idle" | "error" | "success";
+};
+
+export type UpdateProjectState = {
+  fieldErrors?: {
+    description?: string;
+    name?: string;
+    thumbnail?: string;
+  };
+  message?: string;
+  status: "idle" | "error" | "success";
+  thumbnailUrl?: string;
 };
 
 function getStringField(formData: FormData, key: string) {
@@ -97,6 +109,30 @@ function validateProjectInput({
 
   if (thumbnailError) {
     fieldErrors.thumbnail = thumbnailError;
+  }
+
+  return fieldErrors;
+}
+
+function validateProjectTextInput({
+  description,
+  name,
+}: {
+  description: string;
+  name: string;
+}) {
+  const fieldErrors: UpdateProjectState["fieldErrors"] = {};
+
+  if (!name) {
+    fieldErrors.name = "Project name is required.";
+  } else if (name.length > 120) {
+    fieldErrors.name = "Project name must be 120 characters or fewer.";
+  }
+
+  if (!description) {
+    fieldErrors.description = "Description is required.";
+  } else if (description.length > 2000) {
+    fieldErrors.description = "Description must be 2000 characters or fewer.";
   }
 
   return fieldErrors;
@@ -248,6 +284,106 @@ export async function deleteProjectAction(
 
     return {
       message: "Could not delete the project. Try again later.",
+      status: "error",
+    };
+  }
+}
+
+export async function updateProjectAction(
+  projectId: string,
+  _previousState: UpdateProjectState,
+  formData: FormData,
+): Promise<UpdateProjectState> {
+  const name = getStringField(formData, "name");
+  const description = getStringField(formData, "description");
+  const thumbnail = getFileField(formData, "thumbnail");
+  const fieldErrors = validateProjectTextInput({ description, name });
+  const hasThumbnail = Boolean(thumbnail && thumbnail.size > 0);
+
+  if (hasThumbnail) {
+    const thumbnailError = validateUploadImage(thumbnail, {
+      maxSize: MAX_THUMBNAIL_IMAGE_SIZE,
+      requiredMessage: "Thumbnail image is required.",
+    });
+
+    if (thumbnailError) {
+      fieldErrors.thumbnail = thumbnailError;
+    }
+  }
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return {
+      fieldErrors,
+      message: "Check the project details and try again.",
+      status: "error",
+    };
+  }
+
+  const project = await getDashboardProject(projectId);
+
+  if (!project) {
+    return {
+      message: "Project not found.",
+      status: "error",
+    };
+  }
+
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  let thumbnailUrl: string | undefined;
+
+  try {
+    await updateProjectRecord({ description, name, projectId });
+
+    if (hasThumbnail && thumbnail) {
+      if (!token) {
+        return {
+          message: "BLOB_READ_WRITE_TOKEN is not configured.",
+          status: "error",
+        };
+      }
+
+      const blobPathname = getProjectThumbnailBlobPath(projectId);
+      const thumbnailImage = await convertImageFileToAvif(
+        thumbnail,
+        blobPathname,
+      );
+      const blob = await put(blobPathname, thumbnailImage.buffer, {
+        access: "public",
+        allowOverwrite: true,
+        contentType: thumbnailImage.contentType,
+        token,
+      });
+
+      await createProjectThumbnailRecord({
+        altText: name,
+        blobContentType: blob.contentType ?? "image/avif",
+        blobDownloadUrl: blob.downloadUrl ?? null,
+        blobPathname: blob.pathname,
+        blobSize: thumbnailImage.outputSize,
+        blobUrl: blob.url,
+        height: thumbnailImage.height,
+        projectId,
+        width: thumbnailImage.width,
+      });
+
+      thumbnailUrl = blob.url;
+    }
+
+    revalidatePath("/dashboard/projects");
+    revalidatePath(`/dashboard/projects/${projectId}/images`);
+    revalidatePath("/projects");
+    revalidatePath("/api/projects");
+
+    return {
+      message: "Project updated.",
+      status: "success",
+      thumbnailUrl,
+    };
+  } catch (error) {
+    console.error("Update project error:", error);
+
+    return {
+      message: "Could not update the project. Try again later.",
       status: "error",
     };
   }

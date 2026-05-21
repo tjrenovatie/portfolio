@@ -351,6 +351,36 @@ export async function createProjectRecord({
   return mapProject(rows[0]);
 }
 
+export async function updateProjectRecord({
+  description,
+  name,
+  projectId,
+}: {
+  description: string;
+  name: string;
+  projectId: string;
+}) {
+  const rows = (await sql`
+    UPDATE projects
+    SET
+      name = ${name},
+      description = ${description}
+    WHERE id = ${projectId}
+    RETURNING
+      id,
+      name,
+      slug,
+      description,
+      thumbnail_image_id,
+      NULL AS thumbnail_url,
+      NULL AS thumbnail_pathname,
+      created_at,
+      updated_at
+  `) as ProjectRow[];
+
+  return rows[0] ? mapProject(rows[0]) : null;
+}
+
 export async function deleteProjectRecord(projectId: string) {
   await sql`
     DELETE FROM projects

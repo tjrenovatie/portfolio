@@ -1,7 +1,8 @@
 import { getDashboardProjects } from "@/lib/db-projects";
-import { PencilIcon } from "@heroicons/react/24/outline";
+import { PhotoIcon } from "@heroicons/react/24/outline";
 import { DashboardButtonLink } from "@/components/dashboard";
 import DeleteProjectButton from "./DeleteProjectButton";
+import ManageProjectButton from "./ManageProjectButton";
 import NewProjectDialog from "./NewProjectDialog";
 
 export const dynamic = "force-dynamic";
@@ -85,13 +86,19 @@ export default async function DashboardProjectsPage() {
                 </div>
 
                 <div className="flex items-center gap-2 md:justify-end">
+                  <ManageProjectButton
+                    description={project.description}
+                    projectId={project.id}
+                    projectName={project.name}
+                    thumbnailUrl={project.thumbnailUrl}
+                  />
                   <DashboardButtonLink
                     href={`/dashboard/projects/${project.id}/images`}
                     variant="secondary"
                     className="h-10 w-10 !gap-0 !p-0"
-                    aria-label={`Manage ${project.name}`}
+                    aria-label={`Manage images for ${project.name}`}
                   >
-                    <PencilIcon className="h-4 w-4" aria-hidden="true" />
+                    <PhotoIcon className="h-4 w-4" aria-hidden="true" />
                   </DashboardButtonLink>
                   <DeleteProjectButton
                     projectId={project.id}
