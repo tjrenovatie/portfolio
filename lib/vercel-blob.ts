@@ -27,22 +27,3 @@ export async function getFirstBlobUrl(
     return fallback ?? "/fallback.avif";
   }
 }
-
-export async function getAllBlobUrls(prefix: string): Promise<string[]> {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (!token) {
-    return [];
-  }
-
-  try {
-    const { blobs } = await list({ prefix, token });
-    return blobs.filter((b) => !b.pathname.endsWith("/")).map((b) => b.url);
-  } catch (error) {
-    if (isMissingBlobStoreError(error)) {
-      return [];
-    }
-
-    console.warn(`Blob list error for prefix "${prefix}":`, error);
-    return [];
-  }
-}

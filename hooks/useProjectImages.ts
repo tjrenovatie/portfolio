@@ -3,10 +3,6 @@
 
 import { useState, useEffect } from "react";
 
-interface ProjectImageCache {
-  data: Record<string, string[]>;
-}
-
 type ProjectsApiProject = {
   id: string;
   imageUrls?: string[];
@@ -47,22 +43,10 @@ export function useProjectImages(prefix: string | null) {
           return;
         }
 
-        return fetch("/api/project-images/all", { next: { revalidate: 86400 } })
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error("Failed to fetch");
-            }
-
-            return res.json();
-          })
-          .then(({ data }: { data: ProjectImageCache["data"] }) => {
-            if (ignore) return;
-
-            setImageCache((currentCache) => ({
-              ...currentCache,
-              [prefix]: data[prefix] || [],
-            }));
-          });
+        setImageCache((currentCache) => ({
+          ...currentCache,
+          [prefix]: [],
+        }));
       })
       .catch((err) => {
         if (ignore) return;
