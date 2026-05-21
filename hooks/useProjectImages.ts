@@ -7,6 +7,11 @@ interface ProjectImageCache {
   data: Record<string, string[]>;
 }
 
+type ProjectsApiProject = {
+  id: string;
+  imageUrls?: string[];
+};
+
 export function useProjectImages(prefix: string | null) {
   const [imageCache, setImageCache] = useState<Record<string, string[]>>({});
   const [error, setError] = useState<{
@@ -21,7 +26,7 @@ export function useProjectImages(prefix: string | null) {
 
     let ignore = false;
 
-    fetch("/api/project-images/all", { next: { revalidate: 86400 } })
+    fetch("/api/projects", { next: { revalidate: 3600 } })
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch");
@@ -29,16 +34,43 @@ export function useProjectImages(prefix: string | null) {
 
         return res.json();
       })
-      .then(({ data }: { data: ProjectImageCache["data"] }) => {
+      .then(({ data }: { data: ProjectsApiProject[] }) => {
+        if (ignore) return;
+
+        const databaseProject = data.find((project) => project.id === prefix);
+
+        if (databaseProject) {
+          setImageCache((currentCache) => ({
+            ...currentCache,
+            [prefix]: databaseProject.imageUrls ?? [],
+          }));
+          return;
+        }
+
+        return fetch("/api/project-images/all", { next: { revalidate: 86400 } })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error("Failed to fetch");
+            }
+
+            return res.json();
+          })
+          .then(({ data }: { data: ProjectImageCache["data"] }) => {
+            if (ignore) return;
+
+            setImageCache((currentCache) => ({
+              ...currentCache,
+              [prefix]: data[prefix] || [],
+            }));
+          });
+      })
+      .catch((err) => {
         if (ignore) return;
 
         setImageCache((currentCache) => ({
           ...currentCache,
-          [prefix]: data[prefix] || [],
+          [prefix]: [],
         }));
-      })
-      .catch((err) => {
-        if (ignore) return;
 
         setError({ message: err.message, prefix });
       });

@@ -3,9 +3,13 @@
 
 import { useState, useEffect } from "react";
 import ImageViewer from "@/components/imageViewer";
-import { projects, type Project } from "@/lib/projects";
+import type { Project } from "@/lib/projects";
 
-export default function ProjectsClientWrapper() {
+export default function ProjectsClientWrapper({
+  projects,
+}: {
+  projects: Project[];
+}) {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -31,7 +35,7 @@ export default function ProjectsClientWrapper() {
 
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
-  }, []);
+  }, [projects]);
 
   return (
     <ImageViewer

@@ -26,7 +26,12 @@ export default function ImageViewer({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [direction, setDirection] = useState(0);
-  const { images, loading } = useProjectImages(project?.blobPrefix ?? null);
+  const directImages = project?.imageUrls ?? [];
+  const shouldFetchBlobImages = directImages.length === 0;
+  const { images: fetchedImages, loading } = useProjectImages(
+    shouldFetchBlobImages ? project?.blobPrefix ?? null : null,
+  );
+  const images = directImages.length > 0 ? directImages : fetchedImages;
   const thumbStripRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<number | null>(null);
   const wasOpenRef = useRef(false);
