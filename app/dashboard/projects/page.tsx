@@ -4,6 +4,7 @@ import { DashboardButtonLink } from "@/components/dashboard";
 import DeleteProjectButton from "./DeleteProjectButton";
 import ManageProjectButton from "./ManageProjectButton";
 import NewProjectDialog from "./NewProjectDialog";
+import ReorderProjectButtons from "./ReorderProjectButtons";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -52,7 +53,7 @@ export default async function DashboardProjectsPage() {
           </div>
         ) : (
           <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
-            {projects.map((project) => (
+            {projects.map((project, index) => (
               <div
                 key={project.id}
                 className="grid gap-4 px-5 py-4 md:grid-cols-[5rem_1fr_auto] md:items-center"
@@ -86,6 +87,12 @@ export default async function DashboardProjectsPage() {
                 </div>
 
                 <div className="flex items-center gap-2 md:justify-end">
+                  <ReorderProjectButtons
+                    isFirst={index === 0}
+                    isLast={index === projects.length - 1}
+                    projectId={project.id}
+                    projectName={project.name}
+                  />
                   <ManageProjectButton
                     description={project.description}
                     projectId={project.id}

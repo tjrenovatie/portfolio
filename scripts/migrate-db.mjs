@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { neon } from "@neondatabase/serverless";
 
@@ -9,8 +9,7 @@ if (!databaseUrl) {
 }
 
 const sql = neon(databaseUrl);
-const migrationPath = join(process.cwd(), "db", "migrations", "001_create_projects.sql");
-const migration = await readFile(migrationPath, "utf8");
+const migrationsDirectory = join(process.cwd(), "db", "migrations");
 
 function splitSqlStatements(source) {
   const statements = [];
@@ -51,10 +50,18 @@ function splitSqlStatements(source) {
   return statements;
 }
 
-const statements = splitSqlStatements(migration);
+const migrationFiles = (await readdir(migrationsDirectory))
+  .filter((fileName) => fileName.endsWith(".sql"))
+  .sort((firstFile, secondFile) => firstFile.localeCompare(secondFile));
 
-for (const statement of statements) {
-  await sql.query(statement);
+for (const migrationFile of migrationFiles) {
+  const migrationPath = join(migrationsDirectory, migrationFile);
+  const migration = await readFile(migrationPath, "utf8");
+  const statements = splitSqlStatements(migration);
+
+  for (const statement of statements) {
+    await sql.query(statement);
+  }
+
+  console.log(`Applied database migration: ${migrationFile}`);
 }
-
-console.log("Applied database migration: 001_create_projects.sql");

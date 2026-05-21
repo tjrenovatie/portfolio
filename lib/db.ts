@@ -16,6 +16,7 @@ export type ProjectRecord = {
   thumbnailImageId: string | null;
   thumbnailUrl: string | null;
   thumbnailPathname: string | null;
+  sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
 };

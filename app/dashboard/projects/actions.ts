@@ -9,6 +9,7 @@ import {
   getDashboardProject,
   getProjectImages,
   projectSlugExists,
+  reorderProject,
   updateProjectRecord,
 } from "@/lib/db-projects";
 import {
@@ -42,6 +43,11 @@ export type UpdateProjectState = {
   message?: string;
   status: "idle" | "error" | "success";
   thumbnailUrl?: string;
+};
+
+export type ReorderProjectState = {
+  message?: string;
+  status: "error" | "success";
 };
 
 function getStringField(formData: FormData, key: string) {
@@ -284,6 +290,39 @@ export async function deleteProjectAction(
 
     return {
       message: "Could not delete the project. Try again later.",
+      status: "error",
+    };
+  }
+}
+
+export async function reorderProjectAction(
+  projectId: string,
+  direction: "down" | "up",
+): Promise<ReorderProjectState> {
+  try {
+    const didReorder = await reorderProject({ direction, projectId });
+
+    if (!didReorder) {
+      return {
+        message: "Project could not be moved.",
+        status: "error",
+      };
+    }
+
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/projects");
+    revalidatePath("/projects");
+    revalidatePath("/api/projects");
+
+    return {
+      message: "Project order updated.",
+      status: "success",
+    };
+  } catch (error) {
+    console.error("Reorder project error:", error);
+
+    return {
+      message: "Could not update the project order. Try again later.",
       status: "error",
     };
   }

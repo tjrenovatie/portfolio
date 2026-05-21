@@ -13,6 +13,7 @@ type ProjectRow = {
   thumbnail_image_id: string | null;
   thumbnail_url: string | null;
   thumbnail_pathname: string | null;
+  sort_order: number | string;
   created_at: Date;
   updated_at: Date;
 };
@@ -42,6 +43,7 @@ function mapProject(row: ProjectRow): ProjectRecord {
     thumbnailImageId: row.thumbnail_image_id,
     thumbnailUrl: row.thumbnail_url,
     thumbnailPathname: row.thumbnail_pathname,
+    sortOrder: Number(row.sort_order),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -114,12 +116,13 @@ export async function getDashboardProjects() {
       projects.thumbnail_image_id,
       project_images.blob_url AS thumbnail_url,
       project_images.blob_pathname AS thumbnail_pathname,
+      projects.sort_order,
       projects.created_at,
       projects.updated_at
     FROM projects
     LEFT JOIN project_images
       ON project_images.id = projects.thumbnail_image_id
-    ORDER BY projects.created_at DESC
+    ORDER BY projects.sort_order ASC, projects.created_at ASC
   `) as ProjectRow[];
 
   return rows.map(mapProject);
@@ -135,6 +138,7 @@ export async function getDashboardProject(projectId: string) {
       projects.thumbnail_image_id,
       project_images.blob_url AS thumbnail_url,
       project_images.blob_pathname AS thumbnail_pathname,
+      projects.sort_order,
       projects.created_at,
       projects.updated_at
     FROM projects
@@ -261,6 +265,7 @@ export async function getPublicProjects() {
       projects.thumbnail_image_id,
       thumbnail.blob_url AS thumbnail_url,
       thumbnail.blob_pathname AS thumbnail_pathname,
+      projects.sort_order,
       projects.created_at,
       projects.updated_at,
       project_images.id AS image_id,
@@ -280,7 +285,7 @@ export async function getPublicProjects() {
       ON thumbnail.id = projects.thumbnail_image_id
     LEFT JOIN project_images
       ON project_images.project_id = projects.id
-    ORDER BY projects.created_at DESC, project_images.sort_order ASC, project_images.created_at ASC
+    ORDER BY projects.sort_order ASC, projects.created_at ASC, project_images.sort_order ASC, project_images.created_at ASC
   `) as ProjectWithImagesRow[];
 
   const projectsById = new Map<string, PublicProject>();
@@ -324,6 +329,15 @@ export async function projectSlugExists(slug: string) {
   return rows.length > 0;
 }
 
+export async function getNextProjectSortOrder() {
+  const rows = (await sql`
+    SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_sort_order
+    FROM projects
+  `) as { next_sort_order: number | string }[];
+
+  return Number(rows[0]?.next_sort_order ?? 0);
+}
+
 export async function createProjectRecord({
   description,
   name,
@@ -333,9 +347,11 @@ export async function createProjectRecord({
   name: string;
   slug: string;
 }) {
+  const sortOrder = await getNextProjectSortOrder();
+
   const rows = (await sql`
-    INSERT INTO projects (name, slug, description)
-    VALUES (${name}, ${slug}, ${description})
+    INSERT INTO projects (name, slug, description, sort_order)
+    VALUES (${name}, ${slug}, ${description}, ${sortOrder})
     RETURNING
       id,
       name,
@@ -344,6 +360,7 @@ export async function createProjectRecord({
       thumbnail_image_id,
       NULL AS thumbnail_url,
       NULL AS thumbnail_pathname,
+      sort_order,
       created_at,
       updated_at
   `) as ProjectRow[];
@@ -374,6 +391,7 @@ export async function updateProjectRecord({
       thumbnail_image_id,
       NULL AS thumbnail_url,
       NULL AS thumbnail_pathname,
+      sort_order,
       created_at,
       updated_at
   `) as ProjectRow[];
@@ -386,6 +404,47 @@ export async function deleteProjectRecord(projectId: string) {
     DELETE FROM projects
     WHERE id = ${projectId}
   `;
+}
+
+export async function reorderProject({
+  direction,
+  projectId,
+}: {
+  direction: "down" | "up";
+  projectId: string;
+}) {
+  const rows = (await sql`
+    SELECT id
+    FROM projects
+    ORDER BY sort_order ASC, created_at ASC
+  `) as { id: string }[];
+
+  const currentIndex = rows.findIndex((row) => row.id === projectId);
+
+  if (currentIndex === -1) {
+    return false;
+  }
+
+  const nextIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
+
+  if (nextIndex < 0 || nextIndex >= rows.length) {
+    return false;
+  }
+
+  const orderedProjectIds = rows.map((row) => row.id);
+  const [projectToMove] = orderedProjectIds.splice(currentIndex, 1);
+  orderedProjectIds.splice(nextIndex, 0, projectToMove);
+
+  for (const [sortOrder, orderedProjectId] of orderedProjectIds.entries()) {
+    await sql`
+      UPDATE projects
+      SET sort_order = ${sortOrder}
+      WHERE id = ${orderedProjectId}
+        AND sort_order IS DISTINCT FROM ${sortOrder}
+    `;
+  }
+
+  return true;
 }
 
 export async function createProjectThumbnailRecord({
