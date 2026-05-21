@@ -24,9 +24,14 @@ export default function NewProjectDialog() {
   );
 
   useEffect(() => {
-    if (state.status === "success") {
-      formRef.current?.reset();
+    if (state.status !== "success") {
+      return;
     }
+
+    formRef.current?.reset();
+    const closeTimer = window.setTimeout(() => setIsOpen(false), 0);
+
+    return () => window.clearTimeout(closeTimer);
   }, [state.status]);
 
   return (
