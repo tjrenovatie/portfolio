@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   ChartBarIcon,
+  IdentificationIcon,
   FolderIcon,
   HomeIcon,
   MoonIcon,
@@ -17,6 +18,7 @@ import { DashboardButton } from "@/components/dashboard";
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: ChartBarIcon },
+  { name: "About", href: "/dashboard/about", icon: IdentificationIcon },
   { name: "Projects", href: "/dashboard/projects", icon: FolderIcon },
   { name: "Images", href: "/dashboard/images", icon: PhotoIcon },
   {

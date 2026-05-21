@@ -7,6 +7,7 @@ import {
   MotionP,
   MotionSection,
 } from "@/components/motion";
+import { getProfileImageBlobPath } from "@/lib/blob-paths";
 import { getFirstBlobUrl } from "@/lib/vercel-blob";
 
 const contactHighlights = [
@@ -64,7 +65,7 @@ const contactSectionVariants: Variants = {
 
 const About = async () => {
   const profileSrc = await getFirstBlobUrl(
-    "profile/profile-image",
+    getProfileImageBlobPath(),
     "/assets/img/profile/profile-image.avif",
   );
 

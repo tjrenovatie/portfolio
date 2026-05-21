@@ -48,3 +48,7 @@ export function getProjectGalleryBlobPath({
 
   return `${getProjectBlobBasePath(projectId)}/images/${paddedIndex}-${fileName}.avif`;
 }
+
+export function getProfileImageBlobPath() {
+  return `${getBlobEnvironmentPrefix()}/profile/profile-image.avif`;
+}
