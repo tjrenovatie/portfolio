@@ -1,10 +1,12 @@
 "use client";
 
 import { PhotoIcon } from "@heroicons/react/24/outline";
-import { useActionState, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import {
   DashboardButton,
   DashboardFileInput,
+  DashboardStatusMessage,
 } from "@/components/dashboard";
 import {
   convertGalleryImagesAction,
@@ -15,6 +17,7 @@ const initialConvertGalleryImagesState: ConvertGalleryImagesState = {
   status: "idle",
 };
 
+const MAX_GALLERY_FILES = 20;
 const MAX_IMAGE_SIZE = 15 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set([
   "image/avif",
@@ -27,6 +30,8 @@ type SelectedImage = {
   errors: string[];
   file: File;
 };
+
+type SelectedImageStatus = "invalid" | "ready" | "uploaded" | "uploading";
 
 function formatBytes(bytes: number) {
   const megabytes = bytes / 1024 / 1024;
@@ -50,6 +55,8 @@ function validateImage(file: File) {
 
 export default function ImageUploadForm({ projectId }: { projectId: string }) {
   const [selectedImages, setSelectedImages] = useState<SelectedImage[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(
     convertGalleryImagesAction.bind(null, projectId),
     initialConvertGalleryImagesState,
@@ -58,12 +65,87 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
     () => selectedImages.filter((image) => image.errors.length > 0).length,
     [selectedImages],
   );
+  const uploadedImageNames = useMemo(
+    () =>
+      new Set(
+        (state.status === "success" ? state.convertedImages ?? [] : []).map(
+          (image) => image.originalName,
+        ),
+      ),
+    [state.convertedImages, state.status],
+  );
   const hasImages = selectedImages.length > 0;
-  const hasErrors = invalidCount > 0;
+  const hasTooManyImages = selectedImages.length > MAX_GALLERY_FILES;
+  const hasErrors = invalidCount > 0 || hasTooManyImages;
+  const hasUploadedSelection =
+    state.status === "success" &&
+    hasImages &&
+    selectedImages.every((image) => uploadedImageNames.has(image.file.name));
+
+  useEffect(() => {
+    if (state.status !== "success") {
+      return;
+    }
+
+    router.refresh();
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, [router, state.status]);
+
+  function getSelectedImageStatus(image: SelectedImage): SelectedImageStatus {
+    if (image.errors.length > 0 || hasTooManyImages) {
+      return "invalid";
+    }
+
+    if (isPending) {
+      return "uploading";
+    }
+
+    if (uploadedImageNames.has(image.file.name)) {
+      return "uploaded";
+    }
+
+    return "ready";
+  }
+
+  function getStatusClasses(status: SelectedImageStatus) {
+    if (status === "invalid") {
+      return "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-200";
+    }
+
+    if (status === "uploaded") {
+      return "bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-200";
+    }
+
+    if (status === "uploading") {
+      return "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-200";
+    }
+
+    return "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-200";
+  }
+
+  function getStatusLabel(status: SelectedImageStatus) {
+    if (status === "invalid") {
+      return "Invalid";
+    }
+
+    if (status === "uploaded") {
+      return "Uploaded";
+    }
+
+    if (status === "uploading") {
+      return "Uploading";
+    }
+
+    return "Ready";
+  }
 
   return (
     <form action={formAction} className="space-y-6">
       <DashboardFileInput
+        ref={fileInputRef}
         id="project-gallery-images"
         name="images"
         accept="image/avif,image/jpeg,image/png,image/webp"
@@ -90,6 +172,26 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
         }}
       />
 
+      {isPending && (
+        <section
+          className="rounded-md border border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950"
+          aria-live="polite"
+        >
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm font-bold text-amber-800 dark:text-amber-200">
+              Uploading {selectedImages.length} image
+              {selectedImages.length === 1 ? "" : "s"}
+            </p>
+            <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
+              Converting to AVIF
+            </p>
+          </div>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-amber-100 dark:bg-amber-900">
+            <div className="h-full w-2/3 animate-pulse rounded-full bg-amber-500" />
+          </div>
+        </section>
+      )}
+
       {hasImages && (
         <section className="rounded-md border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
           <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4 dark:border-neutral-800">
@@ -103,7 +205,8 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
 
           <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
             {selectedImages.map((image) => {
-              const isValid = image.errors.length === 0;
+              const status = getSelectedImageStatus(image);
+              const isValid = image.errors.length === 0 && !hasTooManyImages;
 
               return (
                 <div
@@ -120,7 +223,14 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
                     </p>
                     {!isValid && (
                       <ul className="mt-2 space-y-1">
-                        {image.errors.map((error) => (
+                        {[
+                          ...image.errors,
+                          ...(hasTooManyImages
+                            ? [
+                                `Select ${MAX_GALLERY_FILES} images or fewer.`,
+                              ]
+                            : []),
+                        ].map((error) => (
                           <li
                             key={error}
                             className="text-sm font-semibold text-red-600 dark:text-red-400"
@@ -133,13 +243,11 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
                   </div>
 
                   <span
-                    className={`w-fit rounded-md px-3 py-1 text-sm font-semibold ${
-                      isValid
-                        ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-200"
-                        : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-200"
-                    }`}
+                    className={`w-fit rounded-md px-3 py-1 text-sm font-semibold ${getStatusClasses(
+                      status,
+                    )}`}
                   >
-                    {isValid ? "Ready" : "Invalid"}
+                    {getStatusLabel(status)}
                   </span>
                 </div>
               );
@@ -149,15 +257,12 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
       )}
 
       {state.message && (
-        <section
-          className={`rounded-md border px-5 py-4 text-sm font-semibold ${
-            state.status === "success"
-              ? "border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-200"
-              : "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
-          }`}
+        <DashboardStatusMessage
+          className="px-5 py-4"
+          status={state.status === "success" ? "success" : "error"}
         >
           {state.message}
-        </section>
+        </DashboardStatusMessage>
       )}
 
       {state.fileErrors && state.fileErrors.length > 0 && (
@@ -221,11 +326,19 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
       <div className="rounded-md border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">
         <DashboardButton
           type="submit"
-          disabled={!hasImages || hasErrors || isPending}
+          disabled={!hasImages || hasErrors || hasUploadedSelection || isPending}
           className="min-h-11 w-full px-5 sm:w-auto"
-          variant={!hasImages || hasErrors || isPending ? "disabled" : "primary"}
+          variant={
+            !hasImages || hasErrors || hasUploadedSelection || isPending
+              ? "disabled"
+              : "primary"
+          }
         >
-          {isPending ? "Uploading..." : "Upload images"}
+          {isPending
+            ? "Uploading..."
+            : hasUploadedSelection
+              ? "Select new images"
+              : "Upload images"}
         </DashboardButton>
         <p className="mt-3 text-xs leading-5 text-neutral-500 dark:text-neutral-400">
           Images are converted to AVIF, uploaded to Vercel Blob, and saved in
@@ -233,8 +346,11 @@ export default function ImageUploadForm({ projectId }: { projectId: string }) {
         </p>
         {hasErrors && (
           <p className="mt-2 text-sm font-semibold text-red-600 dark:text-red-400">
-            Fix {invalidCount} invalid file{invalidCount === 1 ? "" : "s"}{" "}
-            before uploading.
+            {hasTooManyImages
+              ? `Select ${MAX_GALLERY_FILES} images or fewer before uploading.`
+              : `Fix ${invalidCount} invalid file${
+                  invalidCount === 1 ? "" : "s"
+                } before uploading.`}
           </p>
         )}
       </div>

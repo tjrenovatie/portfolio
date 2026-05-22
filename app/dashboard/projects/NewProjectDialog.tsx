@@ -1,11 +1,13 @@
 "use client";
 
 import { PhotoIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useRef, useState } from "react";
 import {
   DashboardButton,
   DashboardDialog,
   DashboardFileInput,
+  DashboardStatusMessage,
   DashboardTextArea,
   DashboardTextInput,
 } from "@/components/dashboard";
@@ -53,6 +55,7 @@ export default function NewProjectDialog() {
 
 function NewProjectForm({ onCreated }: { onCreated: () => void }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(
     createProjectAction,
     initialCreateProjectState,
@@ -64,10 +67,11 @@ function NewProjectForm({ onCreated }: { onCreated: () => void }) {
     }
 
     formRef.current?.reset();
+    router.refresh();
     const closeTimer = window.setTimeout(onCreated, 0);
 
     return () => window.clearTimeout(closeTimer);
-  }, [onCreated, state.status]);
+  }, [onCreated, router, state.status]);
 
   return (
     <form
@@ -76,15 +80,12 @@ function NewProjectForm({ onCreated }: { onCreated: () => void }) {
       className="grid max-h-[calc(100dvh-10rem)] gap-6 overflow-y-auto bg-neutral-50 p-5 dark:bg-neutral-950 lg:grid-cols-[1fr_20rem]"
     >
       {state.message && (
-        <div
-          className={`lg:col-span-2 rounded-md border px-4 py-3 text-sm font-semibold ${
-            state.status === "success"
-              ? "border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-200"
-              : "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
-          }`}
+        <DashboardStatusMessage
+          className="lg:col-span-2"
+          status={state.status === "success" ? "success" : "error"}
         >
           {state.message}
-        </div>
+        </DashboardStatusMessage>
       )}
 
       <section className="grid gap-5 rounded-md border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900">

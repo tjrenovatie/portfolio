@@ -1,10 +1,12 @@
 "use client";
 
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 import {
   DashboardButton,
   DashboardDialog,
+  DashboardStatusMessage,
 } from "@/components/dashboard";
 import { deleteProjectAction, type DeleteProjectState } from "./actions";
 
@@ -22,6 +24,7 @@ export default function DeleteProjectButton({
   projectName,
 }: DeleteProjectButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
   const [state, formAction, isPending] = useActionState(
     deleteProjectAction.bind(null, projectId),
     initialDeleteProjectState,
@@ -32,10 +35,11 @@ export default function DeleteProjectButton({
       return;
     }
 
+    router.refresh();
     const closeTimer = window.setTimeout(() => setIsOpen(false), 0);
 
     return () => window.clearTimeout(closeTimer);
-  }, [state.status]);
+  }, [router, state.status]);
 
   return (
     <>
@@ -57,15 +61,11 @@ export default function DeleteProjectButton({
       >
         <form action={formAction} className="space-y-5 bg-neutral-50 p-5 dark:bg-neutral-950">
           {state.message && (
-            <p
-              className={`rounded-md border px-4 py-3 text-sm font-semibold ${
-                state.status === "success"
-                  ? "border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-200"
-                  : "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
-              }`}
+            <DashboardStatusMessage
+              status={state.status === "success" ? "success" : "error"}
             >
               {state.message}
-            </p>
+            </DashboardStatusMessage>
           )}
 
           <div className="rounded-md border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900">

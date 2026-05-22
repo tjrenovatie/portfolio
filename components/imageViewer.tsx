@@ -38,7 +38,11 @@ export default function ImageViewer({
     [project?.imageUrls],
   );
   const shouldFetchBlobImages = directImages.length === 0;
-  const { images: fetchedImages, loading } = useProjectImages(
+  const {
+    error,
+    images: fetchedImages,
+    loading,
+  } = useProjectImages(
     shouldFetchBlobImages ? project?.blobPrefix ?? null : null,
   );
   const images = useMemo(
@@ -166,15 +170,64 @@ export default function ImageViewer({
   // ----------------------------------------------------------------------
   // 8. Render
   // ----------------------------------------------------------------------
-  if (!isOpen || !project || loading) return null;
-  if (images.length === 0) {
+  if (!isOpen || !project) return null;
+  if (loading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="fixed inset-0 z-50 flex items-center justify-center bg-black"
       >
-        <div className="text-white">No images found</div>
+        <div className="text-sm font-semibold text-white">
+          Loading gallery...
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
+      >
+        <div className="max-w-sm text-center">
+          <p className="text-base font-semibold text-white">
+            Could not load this gallery.
+          </p>
+          <p className="mt-2 text-sm text-gray-300">
+            Try again in a moment.
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-5 rounded-md bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (images.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
+      >
+        <div className="max-w-sm text-center">
+          <p className="text-base font-semibold text-white">No images found</p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-5 rounded-md bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
       </motion.div>
     );
   }

@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import {
   DashboardButton,
   DashboardFileInput,
+  DashboardStatusMessage,
 } from "@/components/dashboard";
 import {
   uploadProfileImageAction,
@@ -41,15 +42,11 @@ export default function ProfileImageUploadForm() {
       />
 
       {state.message && (
-        <p
-          className={`rounded-md border px-4 py-3 text-sm font-semibold ${
-            state.status === "success"
-              ? "border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-200"
-              : "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200"
-          }`}
+        <DashboardStatusMessage
+          status={state.status === "success" ? "success" : "error"}
         >
           {state.message}
-        </p>
+        </DashboardStatusMessage>
       )}
 
       <DashboardButton

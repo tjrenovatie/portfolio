@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode } from "react";
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from "react";
 
 type DashboardFileInputProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: string;
@@ -8,17 +8,23 @@ type DashboardFileInputProps = InputHTMLAttributes<HTMLInputElement> & {
   title: string;
 };
 
-export function DashboardFileInput({
-  "aria-describedby": ariaDescribedBy,
-  className,
-  error,
-  helperText,
-  icon,
-  id,
-  label,
-  title,
-  ...props
-}: DashboardFileInputProps) {
+export const DashboardFileInput = forwardRef<
+  HTMLInputElement,
+  DashboardFileInputProps
+>(function DashboardFileInput(
+  {
+    "aria-describedby": ariaDescribedBy,
+    className,
+    error,
+    helperText,
+    icon,
+    id,
+    label,
+    title,
+    ...props
+  },
+  ref,
+) {
   const errorId = error && id ? `${id}-error` : undefined;
   const helperId = helperText && id ? `${id}-help` : undefined;
   const describedBy = [ariaDescribedBy, helperId, errorId]
@@ -63,6 +69,7 @@ export function DashboardFileInput({
         <input
           id={id}
           aria-describedby={describedBy || undefined}
+          ref={ref}
           {...ariaProps}
           {...props}
           type="file"
@@ -81,4 +88,4 @@ export function DashboardFileInput({
       </div>
     </section>
   );
-}
+});
