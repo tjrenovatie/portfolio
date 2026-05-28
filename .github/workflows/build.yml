@@ -57,13 +57,13 @@ jobs:
         run: |
           touch .env.migrate.local
 
-          has_database_url() {
-            node --env-file="$1" -e "const url = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); process.exit(url ? 0 : 1)" 2>/dev/null
+          has_valid_database_url() {
+            node --env-file="$1" -e "const raw = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); if (!raw) process.exit(1); const url = raw.replace(/^(DATABASE_URL|POSTGRES_URL)=/, '').replace(/^[\"']|[\"']$/g, '').trim(); try { const parsed = new URL(url); process.exit(['postgres:', 'postgresql:'].includes(parsed.protocol) ? 0 : 1); } catch { process.exit(1); }" 2>/dev/null
           }
 
-          if has_database_url ".env.migrate.local"; then
+          if has_valid_database_url ".env.migrate.local"; then
             echo "Using database URL from .env.migrate.local."
-          elif [ -f ".vercel/.env.${{ inputs.environment }}.local" ] && has_database_url ".vercel/.env.${{ inputs.environment }}.local"; then
+          elif [ -f ".vercel/.env.${{ inputs.environment }}.local" ] && has_valid_database_url ".vercel/.env.${{ inputs.environment }}.local"; then
             cp ".vercel/.env.${{ inputs.environment }}.local" ".env.migrate.local"
             echo "Using database URL from .vercel/.env.${{ inputs.environment }}.local."
           elif [ -n "${MIGRATION_DATABASE_URL}" ]; then
@@ -80,8 +80,8 @@ jobs:
 
       - name: Validate database migration environment
         run: |
-          if ! node --env-file=.env.migrate.local -e "const url = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); process.exit(url ? 0 : 1)"; then
-            echo "DATABASE_URL or POSTGRES_URL is missing or empty in the prepared migration environment."
+          if ! node --env-file=.env.migrate.local -e "const raw = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); if (!raw) process.exit(1); const url = raw.replace(/^(DATABASE_URL|POSTGRES_URL)=/, '').replace(/^[\"']|[\"']$/g, '').trim(); try { const parsed = new URL(url); process.exit(['postgres:', 'postgresql:'].includes(parsed.protocol) ? 0 : 1); } catch { process.exit(1); }"; then
+            echo "DATABASE_URL or POSTGRES_URL is missing, empty, or not a valid Postgres URL in the prepared migration environment."
             exit 1
           fi
 

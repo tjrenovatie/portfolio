@@ -1,7 +1,30 @@
 import { neon } from "@neondatabase/serverless";
 
-const databaseUrl =
+function normalizeDatabaseUrl(rawDatabaseUrl: string) {
+  const databaseUrl = rawDatabaseUrl
+    .replace(/^(DATABASE_URL|POSTGRES_URL)=/, "")
+    .replace(/^["']|["']$/g, "")
+    .trim();
+
+  let parsedDatabaseUrl: URL;
+
+  try {
+    parsedDatabaseUrl = new URL(databaseUrl);
+  } catch {
+    throw new Error("DATABASE_URL or POSTGRES_URL must be a valid URL.");
+  }
+
+  if (!["postgres:", "postgresql:"].includes(parsedDatabaseUrl.protocol)) {
+    throw new Error("DATABASE_URL or POSTGRES_URL must be a Postgres URL.");
+  }
+
+  return databaseUrl;
+}
+
+const rawDatabaseUrl =
   process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
+
+const databaseUrl = rawDatabaseUrl ? normalizeDatabaseUrl(rawDatabaseUrl) : "";
 
 function throwMissingDatabaseUrl(): never {
   throw new Error("DATABASE_URL or POSTGRES_URL must be set.");
