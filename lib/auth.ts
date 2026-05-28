@@ -1,5 +1,9 @@
 import { getServerSession, type NextAuthOptions, type Session } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import {
+  authSecurityOptions,
+  getSafeAuthRedirectUrl,
+} from "@/lib/auth-security";
 import { DASHBOARD_LOGIN_PATH } from "@/lib/dashboard-auth-routes";
 
 export const DASHBOARD_UNAUTHORIZED_MESSAGE =
@@ -17,6 +21,9 @@ export function isAllowedGoogleEmail(email?: string | null) {
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    async redirect({ baseUrl, url }) {
+      return getSafeAuthRedirectUrl({ baseUrl, url });
+    },
     async signIn({ account, profile }) {
       if (account?.provider !== "google") {
         return false;
@@ -39,6 +46,7 @@ export const authOptions: NextAuthOptions = {
     error: DASHBOARD_LOGIN_PATH,
     signIn: DASHBOARD_LOGIN_PATH,
   },
+  ...authSecurityOptions,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
@@ -46,9 +54,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-  },
 };
 
 export async function getDashboardSession(): Promise<Session | null> {
