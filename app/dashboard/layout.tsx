@@ -1,20 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import {
   ChartBarIcon,
   IdentificationIcon,
   FolderIcon,
   HomeIcon,
-  MoonIcon,
   RectangleGroupIcon,
   PhotoIcon,
-  SunIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { DashboardButton } from "@/components/dashboard";
+import {
+  DashboardButton,
+  DashboardLogoutButton,
+} from "@/components/dashboard";
+import { DASHBOARD_LOGIN_PATH } from "@/lib/dashboard-auth-routes";
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: ChartBarIcon },
@@ -28,67 +31,30 @@ const navigation = [
   },
 ];
 
-function subscribeToColorScheme(callback: () => void) {
-  if (typeof window === "undefined") {
-    return () => {};
-  }
-
-  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-  mediaQuery.addEventListener("change", callback);
-
-  return () => {
-    mediaQuery.removeEventListener("change", callback);
-  };
-}
-
-function getColorSchemeSnapshot() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
-
-function getServerColorSchemeSnapshot() {
-  return false;
-}
-
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const systemPrefersDark = useSyncExternalStore(
-    subscribeToColorScheme,
-    getColorSchemeSnapshot,
-    getServerColorSchemeSnapshot,
-  );
-  const [themeOverride, setThemeOverride] = useState<boolean | null>(null);
+  const pathname = usePathname();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const isDarkMode = themeOverride ?? systemPrefersDark;
-  const themeClasses = isDarkMode
-    ? "bg-neutral-950 text-neutral-100"
-    : "bg-neutral-100 text-neutral-950";
-  const panelClasses = isDarkMode
-    ? "border-neutral-800 bg-neutral-900"
-    : "border-neutral-200 bg-white";
-  const navigationClasses = isDarkMode
-    ? "text-neutral-300 hover:bg-neutral-800 hover:text-white"
-    : "text-neutral-700 hover:bg-neutral-100 hover:text-neutral-950";
-  const iconButtonClasses = isDarkMode
-    ? "border-neutral-700 bg-neutral-800 text-neutral-100 hover:border-neutral-600 hover:bg-neutral-700"
-    : "border-neutral-300 bg-white text-neutral-800 hover:border-[--color-primary] hover:text-[--color-secondary]";
+  const themeClasses = "bg-neutral-950 text-neutral-100";
+  const panelClasses = "border-neutral-800 bg-neutral-900";
+  const navigationClasses =
+    "text-neutral-300 hover:bg-neutral-800 hover:text-white";
   const sidebarWidthClasses = isSidebarCollapsed ? "w-20" : "w-64";
   const contentOffsetClasses = isSidebarCollapsed ? "lg:pl-20" : "lg:pl-64";
 
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDarkMode);
+    document.documentElement.classList.add("dark");
 
     return () => {
       document.documentElement.classList.remove("dark");
     };
-  }, [isDarkMode]);
+  }, []);
+
+  if (pathname === DASHBOARD_LOGIN_PATH) {
+    return children;
+  }
 
   return (
-    <main
-      className={`min-h-dvh transition-colors ${isDarkMode ? "dark" : ""} ${themeClasses}`}
-    >
+    <main className={`dark min-h-dvh transition-colors ${themeClasses}`}>
       <aside
         className={`fixed inset-y-0 left-0 hidden border-r transition-[width,background-color,border-color] lg:flex lg:flex-col ${sidebarWidthClasses} ${panelClasses}`}
       >
@@ -104,11 +70,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <RectangleGroupIcon className="h-5 w-5" aria-hidden="true" />
         </DashboardButton>
 
-        <div
-          className={`flex h-16 items-center justify-between border-b px-3 ${
-            isDarkMode ? "border-neutral-800" : "border-neutral-200"
-          }`}
-        >
+        <div className="flex h-16 items-center justify-between border-b border-neutral-800 px-3">
           <Link
             href="/dashboard"
             className={`min-w-0 text-sm font-bold tracking-wide ${
@@ -140,11 +102,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        <div
-          className={`border-t p-3 ${
-            isDarkMode ? "border-neutral-800" : "border-neutral-200"
-          }`}
-        >
+        <div className="space-y-2 border-t border-neutral-800 p-3">
           <Link
             href="/"
             className={`flex min-h-11 items-center rounded-md px-3 text-sm font-semibold transition-colors ${
@@ -155,64 +113,29 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
             <HomeIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
             {!isSidebarCollapsed && <span>Public site</span>}
           </Link>
+          <DashboardLogoutButton isCompact={isSidebarCollapsed} />
         </div>
       </aside>
 
       <section className={`transition-[padding] ${contentOffsetClasses}`}>
-        <header
-          className={`sticky top-0 z-30 flex min-h-16 items-center justify-between border-b px-4 backdrop-blur sm:px-6 lg:px-8 ${
-            isDarkMode
-              ? "border-neutral-800 bg-neutral-900/95"
-              : "border-neutral-200 bg-white/95"
-          }`}
-        >
+        <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between border-b border-neutral-800 bg-neutral-900/95 px-4 backdrop-blur sm:px-6 lg:px-8">
           <div>
-            <p
-              className={`text-xs font-semibold uppercase ${
-                isDarkMode ? "text-neutral-400" : "text-neutral-500"
-              }`}
-            >
+            <p className="text-xs font-semibold uppercase text-neutral-400">
               Dashboard
             </p>
-            <h1
-              className={`text-base font-bold ${
-                isDarkMode ? "text-white" : "text-neutral-950"
-              }`}
-            >
+            <h1 className="text-base font-bold text-white">
               Content management
             </h1>
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              aria-label={
-                isDarkMode ? "Switch to light mode" : "Switch to dark mode"
-              }
-              aria-pressed={isDarkMode}
-              onClick={() => setThemeOverride(!isDarkMode)}
-              className={`inline-flex h-10 w-10 items-center justify-center rounded-md border transition-colors ${iconButtonClasses}`}
-            >
-              {isDarkMode ? (
-                <SunIcon
-                  className="h-5 w-5 text-amber-300"
-                  aria-hidden="true"
-                />
-              ) : (
-                <MoonIcon className="h-5 w-5" aria-hidden="true" />
-              )}
-            </button>
-
             <Link
               href="/"
-              className={`inline-flex min-h-10 items-center justify-center rounded-md border px-4 text-sm font-semibold transition-colors lg:hidden ${
-                isDarkMode
-                  ? "border-neutral-700 text-neutral-100 hover:border-neutral-500 hover:text-white"
-                  : "border-neutral-300 text-neutral-800 hover:border-[--color-primary] hover:text-[--color-secondary]"
-              }`}
+              className="inline-flex min-h-10 items-center justify-center rounded-md border border-neutral-700 px-4 text-sm font-semibold text-neutral-100 transition-colors hover:border-neutral-500 hover:text-white lg:hidden"
             >
               Public site
             </Link>
+            <DashboardLogoutButton isCompact />
           </div>
         </header>
 
