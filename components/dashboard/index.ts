@@ -1,6 +1,7 @@
 export { DashboardButton, DashboardButtonLink } from "./Button";
 export { DashboardDialog } from "./Dialog";
 export { DashboardFileInput } from "./FileInput";
+export { DashboardGoogleLoginButton } from "./GoogleLoginButton";
 export { DashboardLogoutButton } from "./LogoutButton";
 export { DashboardStatusMessage } from "./StatusMessage";
 export { DashboardTextArea } from "./TextArea";

@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { DashboardButton } from "@/components/dashboard";
+import { DashboardButton } from "@/components/dashboard/Button";
 
-type GoogleLoginButtonProps = {
+type DashboardGoogleLoginButtonProps = {
   callbackUrl: string;
 };
 
@@ -36,9 +36,9 @@ function GoogleIcon() {
   );
 }
 
-export default function GoogleLoginButton({
+export function DashboardGoogleLoginButton({
   callbackUrl,
-}: GoogleLoginButtonProps) {
+}: DashboardGoogleLoginButtonProps) {
   const [isPending, setIsPending] = useState(false);
 
   return (
