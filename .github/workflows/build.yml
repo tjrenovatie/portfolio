@@ -38,8 +38,18 @@ jobs:
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
 
+      - name: Pull migration environment variables
+        run: vercel env pull .env.migrate.local --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Validate database migration environment
+        run: |
+          if ! grep -Eq '^(DATABASE_URL|POSTGRES_URL)=' .env.migrate.local; then
+            echo "DATABASE_URL or POSTGRES_URL is missing from the ${{ inputs.environment }} Vercel environment."
+            exit 1
+          fi
+
       - name: Run database migrations
-        run: node --env-file=.vercel/.env.${{ inputs.environment }}.local scripts/migrate-db.mjs
+        run: node --env-file=.env.migrate.local scripts/migrate-db.mjs
 
       - name: Debug – List Vercel domains for this scope
         run: |
