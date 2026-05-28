@@ -12,6 +12,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      VERCEL_ENV: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
 
@@ -51,7 +54,7 @@ jobs:
       - name: Build & Deploy Project Artifacts to Preview
         if: ${{ inputs.environment == 'preview' }}
         run: |
-          vercel build --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+          vercel build --target=preview --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
           url="$(vercel deploy --prebuilt --yes \
             --token=${{ secrets.VERCEL_TOKEN }} \
             --scope=${{ secrets.VERCEL_ORG_ID }})"
