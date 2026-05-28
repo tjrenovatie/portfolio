@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { dashboardNoIndexMetadata } from "@/lib/dashboard-seo";
 import { projects } from "@/lib/projects";
+
+export const metadata = dashboardNoIndexMetadata;
 
 const metrics = [
   {

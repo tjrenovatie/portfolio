@@ -3,6 +3,10 @@
 import { del, put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import {
+  DASHBOARD_UNAUTHORIZED_MESSAGE,
+  isDashboardAuthenticated,
+} from "@/lib/auth";
+import {
   createProjectRecord,
   createProjectThumbnailRecord,
   deleteProjectRecord,
@@ -148,6 +152,13 @@ export async function createProjectAction(
   _previousState: CreateProjectState,
   formData: FormData,
 ): Promise<CreateProjectState> {
+  if (!(await isDashboardAuthenticated())) {
+    return {
+      message: DASHBOARD_UNAUTHORIZED_MESSAGE,
+      status: "error",
+    };
+  }
+
   const name = getStringField(formData, "name");
   const description = getStringField(formData, "description");
   const thumbnail = getFileField(formData, "thumbnail");
@@ -247,6 +258,13 @@ export async function deleteProjectAction(
   projectId: string,
   _previousState: DeleteProjectState,
 ): Promise<DeleteProjectState> {
+  if (!(await isDashboardAuthenticated())) {
+    return {
+      message: DASHBOARD_UNAUTHORIZED_MESSAGE,
+      status: "error",
+    };
+  }
+
   const project = await getDashboardProject(projectId);
 
   if (!project) {
@@ -299,6 +317,13 @@ export async function reorderProjectAction(
   projectId: string,
   direction: "down" | "up",
 ): Promise<ReorderProjectState> {
+  if (!(await isDashboardAuthenticated())) {
+    return {
+      message: DASHBOARD_UNAUTHORIZED_MESSAGE,
+      status: "error",
+    };
+  }
+
   try {
     const didReorder = await reorderProject({ direction, projectId });
 
@@ -333,6 +358,13 @@ export async function updateProjectAction(
   _previousState: UpdateProjectState,
   formData: FormData,
 ): Promise<UpdateProjectState> {
+  if (!(await isDashboardAuthenticated())) {
+    return {
+      message: DASHBOARD_UNAUTHORIZED_MESSAGE,
+      status: "error",
+    };
+  }
+
   const name = getStringField(formData, "name");
   const description = getStringField(formData, "description");
   const thumbnail = getFileField(formData, "thumbnail");

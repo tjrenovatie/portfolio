@@ -5,9 +5,11 @@ import {
   getProjectImages,
 } from "@/lib/db-projects";
 import { DashboardButtonLink } from "@/components/dashboard";
+import { dashboardNoIndexMetadata } from "@/lib/dashboard-seo";
 import GalleryImageList from "./GalleryImageList";
 import ImageUploadForm from "./ImageUploadForm";
 
+export const metadata = dashboardNoIndexMetadata;
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 

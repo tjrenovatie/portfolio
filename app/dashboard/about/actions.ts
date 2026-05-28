@@ -2,6 +2,10 @@
 
 import { del, put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
+import {
+  DASHBOARD_UNAUTHORIZED_MESSAGE,
+  isDashboardAuthenticated,
+} from "@/lib/auth";
 import { getProfileImageBlobPath } from "@/lib/blob-paths";
 import {
   convertImageFileToAvif,
@@ -28,6 +32,13 @@ export async function uploadProfileImageAction(
   _previousState: UploadProfileImageState,
   formData: FormData,
 ): Promise<UploadProfileImageState> {
+  if (!(await isDashboardAuthenticated())) {
+    return {
+      message: DASHBOARD_UNAUTHORIZED_MESSAGE,
+      status: "error",
+    };
+  }
+
   const image = getImageFile(formData);
   const imageError = validateUploadImage(image, {
     maxSize: MAX_THUMBNAIL_IMAGE_SIZE,

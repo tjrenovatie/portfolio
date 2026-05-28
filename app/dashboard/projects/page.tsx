@@ -1,11 +1,13 @@
 import { getDashboardProjects } from "@/lib/db-projects";
 import { PhotoIcon } from "@heroicons/react/24/outline";
 import { DashboardButtonLink } from "@/components/dashboard";
+import { dashboardNoIndexMetadata } from "@/lib/dashboard-seo";
 import DeleteProjectButton from "./DeleteProjectButton";
 import ManageProjectButton from "./ManageProjectButton";
 import NewProjectDialog from "./NewProjectDialog";
 import ReorderProjectButtons from "./ReorderProjectButtons";
 
+export const metadata = dashboardNoIndexMetadata;
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 

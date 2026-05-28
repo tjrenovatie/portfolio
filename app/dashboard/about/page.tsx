@@ -1,8 +1,10 @@
 import Image from "next/image";
 import { getProfileImageBlobPath } from "@/lib/blob-paths";
+import { dashboardNoIndexMetadata } from "@/lib/dashboard-seo";
 import { getFirstBlobUrl } from "@/lib/vercel-blob";
 import ProfileImageUploadForm from "./ProfileImageUploadForm";
 
+export const metadata = dashboardNoIndexMetadata;
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 

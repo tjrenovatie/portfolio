@@ -1,6 +1,7 @@
 # Allow all crawlers access to all content
 User-agent: *
-Disallow:
+Disallow: /dashboard/
+Disallow: /dashboard/login
 
 # Disallow access to specific directories
 Disallow: /private/
@@ -13,12 +14,41 @@ Sitemap: https://tj-renovatie.nl/sitemap.xml
 User-agent: Googlebot
 # Increase crawl rate for Google
 Crawl-delay: 10
+Disallow: /dashboard/
+Disallow: /dashboard/login
 Disallow: /no-google/
 
 User-agent: Bingbot
 # Decrease crawl rate for Bing
 Crawl-delay: 20
+Disallow: /dashboard/
+Disallow: /dashboard/login
 Disallow: /no-bing/
+
+# AI and LLM crawlers must not access dashboard routes
+User-agent: GPTBot
+Disallow: /dashboard/
+Disallow: /dashboard/login
+
+User-agent: ChatGPT-User
+Disallow: /dashboard/
+Disallow: /dashboard/login
+
+User-agent: Google-Extended
+Disallow: /dashboard/
+Disallow: /dashboard/login
+
+User-agent: ClaudeBot
+Disallow: /dashboard/
+Disallow: /dashboard/login
+
+User-agent: PerplexityBot
+Disallow: /dashboard/
+Disallow: /dashboard/login
+
+User-agent: CCBot
+Disallow: /dashboard/
+Disallow: /dashboard/login
 
 # Prevent web archives from storing pages
 User-agent: ia_archiver

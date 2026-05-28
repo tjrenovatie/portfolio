@@ -2,6 +2,9 @@ import { getServerSession, type NextAuthOptions, type Session } from "next-auth"
 import GoogleProvider from "next-auth/providers/google";
 import { DASHBOARD_LOGIN_PATH } from "@/lib/dashboard-auth-routes";
 
+export const DASHBOARD_UNAUTHORIZED_MESSAGE =
+  "Sign in with the approved Google account to continue.";
+
 function getAllowedGoogleEmail() {
   return process.env.ALLOWED_GOOGLE_EMAIL?.trim().toLowerCase() ?? "";
 }

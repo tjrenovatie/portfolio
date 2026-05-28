@@ -3,6 +3,10 @@
 import { del, put } from "@vercel/blob";
 import { revalidatePath } from "next/cache";
 import {
+  DASHBOARD_UNAUTHORIZED_MESSAGE,
+  isDashboardAuthenticated,
+} from "@/lib/auth";
+import {
   createGalleryImageRecords,
   getDashboardProject,
   getNextGalleryImageSortOrder,
@@ -71,6 +75,13 @@ export async function convertGalleryImagesAction(
   _previousState: ConvertGalleryImagesState,
   formData: FormData,
 ): Promise<ConvertGalleryImagesState> {
+  if (!(await isDashboardAuthenticated())) {
+    return {
+      message: DASHBOARD_UNAUTHORIZED_MESSAGE,
+      status: "error",
+    };
+  }
+
   const project = await getDashboardProject(projectId);
 
   if (!project) {
@@ -217,6 +228,13 @@ export async function reorderGalleryImageAction(
   imageId: string,
   direction: "down" | "up",
 ): Promise<ReorderGalleryImageState> {
+  if (!(await isDashboardAuthenticated())) {
+    return {
+      message: DASHBOARD_UNAUTHORIZED_MESSAGE,
+      status: "error",
+    };
+  }
+
   const project = await getDashboardProject(projectId);
 
   if (!project) {

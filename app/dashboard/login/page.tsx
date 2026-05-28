@@ -1,11 +1,14 @@
 import { redirect } from "next/navigation";
 import { DashboardStatusMessage } from "@/components/dashboard";
 import { getDashboardSession } from "@/lib/auth";
+import { dashboardNoIndexMetadata } from "@/lib/dashboard-seo";
 import {
   DASHBOARD_HOME_PATH,
   getSafeDashboardCallbackUrl,
 } from "@/lib/dashboard-auth-routes";
 import GoogleLoginButton from "./GoogleLoginButton";
+
+export const metadata = dashboardNoIndexMetadata;
 
 type DashboardLoginPageProps = {
   searchParams?: Promise<{

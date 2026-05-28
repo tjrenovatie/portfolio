@@ -4,11 +4,18 @@ import {
   DASHBOARD_HOME_PATH,
   DASHBOARD_LOGIN_PATH,
 } from "@/lib/dashboard-auth-routes";
+import { DASHBOARD_ROBOTS_HEADER } from "@/lib/dashboard-seo";
 
 function isAllowedDashboardEmail(email?: string | null) {
   const allowedEmail = process.env.ALLOWED_GOOGLE_EMAIL?.trim().toLowerCase();
 
   return Boolean(allowedEmail && email?.trim().toLowerCase() === allowedEmail);
+}
+
+function withDashboardRobotsHeader(response: NextResponse) {
+  response.headers.set("X-Robots-Tag", DASHBOARD_ROBOTS_HEADER);
+
+  return response;
 }
 
 export async function proxy(request: NextRequest) {
@@ -21,17 +28,19 @@ export async function proxy(request: NextRequest) {
   const isAuthenticated = isAllowedDashboardEmail(token?.email);
 
   if (isLoginRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL(DASHBOARD_HOME_PATH, request.url));
+    return withDashboardRobotsHeader(
+      NextResponse.redirect(new URL(DASHBOARD_HOME_PATH, request.url)),
+    );
   }
 
   if (!isLoginRoute && !isAuthenticated) {
     const loginUrl = new URL(DASHBOARD_LOGIN_PATH, request.url);
     loginUrl.searchParams.set("callbackUrl", `${pathname}${search}`);
 
-    return NextResponse.redirect(loginUrl);
+    return withDashboardRobotsHeader(NextResponse.redirect(loginUrl));
   }
 
-  return NextResponse.next();
+  return withDashboardRobotsHeader(NextResponse.next());
 }
 
 export const config = {
