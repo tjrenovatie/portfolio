@@ -1,7 +1,14 @@
 // components/ImageViewer.tsx
 "use client";
 
-import { useState, useEffect, useRef, useCallback, TouchEvent } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  TouchEvent,
+} from "react";
 import Image from "next/image";
 import {
   XMarkIcon,
@@ -26,7 +33,27 @@ export default function ImageViewer({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [direction, setDirection] = useState(0);
-  const { images, loading } = useProjectImages(project?.blobPrefix ?? null);
+  const directImages = useMemo(
+    () => (project?.imageUrls ?? []).filter((src) => src.trim().length > 0),
+    [project?.imageUrls],
+  );
+  const shouldFetchBlobImages = directImages.length === 0;
+  const {
+    error,
+    images: fetchedImages,
+    loading,
+  } = useProjectImages(
+    shouldFetchBlobImages ? project?.blobPrefix ?? null : null,
+  );
+  const images = useMemo(
+    () =>
+      (directImages.length > 0 ? directImages : fetchedImages).filter(
+        (src) => src.trim().length > 0,
+      ),
+    [directImages, fetchedImages],
+  );
+  const activeIndex =
+    images.length === 0 ? 0 : Math.min(currentIndex, images.length - 1);
   const thumbStripRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<number | null>(null);
   const wasOpenRef = useRef(false);
@@ -54,10 +81,10 @@ export default function ImageViewer({
   useEffect(() => {
     if (images.length === 0) return;
     const next = new window.Image();
-    next.src = images[(currentIndex + 1) % images.length];
+    next.src = images[(activeIndex + 1) % images.length];
     const prev = new window.Image();
-    prev.src = images[(currentIndex - 1 + images.length) % images.length];
-  }, [currentIndex, images]);
+    prev.src = images[(activeIndex - 1 + images.length) % images.length];
+  }, [activeIndex, images]);
 
   useEffect(() => {
     if (isOpen) {
@@ -81,12 +108,20 @@ export default function ImageViewer({
 
   const goPrev = useCallback(() => {
     setDirection(-1);
-    setCurrentIndex((i) => (i > 0 ? i - 1 : images.length - 1));
+    setCurrentIndex((index) => {
+      const safeIndex = Math.min(index, images.length - 1);
+
+      return safeIndex > 0 ? safeIndex - 1 : images.length - 1;
+    });
   }, [images.length]);
 
   const goNext = useCallback(() => {
     setDirection(1);
-    setCurrentIndex((i) => (i < images.length - 1 ? i + 1 : 0));
+    setCurrentIndex((index) => {
+      const safeIndex = Math.min(index, images.length - 1);
+
+      return safeIndex < images.length - 1 ? safeIndex + 1 : 0;
+    });
   }, [images.length]);
 
   const goTo = useCallback(
@@ -99,14 +134,14 @@ export default function ImageViewer({
 
   const visibleCount = isMobile ? 5 : 10;
   const half = Math.floor(visibleCount / 2);
-  const visibleStart = Math.max(0, currentIndex - half);
+  const visibleStart = Math.max(0, activeIndex - half);
   const visibleEnd = Math.min(images.length, visibleStart + visibleCount);
   const visibleImages = images.slice(visibleStart, visibleEnd);
 
   useEffect(() => {
     const strip = thumbStripRef.current;
     if (!strip || images.length === 0) return;
-    const visibleIndex = currentIndex - visibleStart;
+    const visibleIndex = activeIndex - visibleStart;
     const activeBtn = strip.children[visibleIndex] as HTMLElement;
     if (!activeBtn) return;
 
@@ -117,7 +152,7 @@ export default function ImageViewer({
       strip.scrollLeft + btnLeft - stripRect.width / 2 + btnRect.width / 2;
 
     strip.scrollTo({ left: targetScroll, behavior: "smooth" });
-  }, [currentIndex, images.length, isMobile, visibleStart]);
+  }, [activeIndex, images.length, isMobile, visibleStart]);
 
   const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
     touchStartRef.current = e.touches[0].clientX;
@@ -135,15 +170,64 @@ export default function ImageViewer({
   // ----------------------------------------------------------------------
   // 8. Render
   // ----------------------------------------------------------------------
-  if (!isOpen || !project || loading) return null;
-  if (images.length === 0) {
+  if (!isOpen || !project) return null;
+  if (loading) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="fixed inset-0 z-50 flex items-center justify-center bg-black"
       >
-        <div className="text-white">No images found</div>
+        <div className="text-sm font-semibold text-white">
+          Loading gallery...
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (error) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
+      >
+        <div className="max-w-sm text-center">
+          <p className="text-base font-semibold text-white">
+            Could not load this gallery.
+          </p>
+          <p className="mt-2 text-sm text-gray-300">
+            Try again in a moment.
+          </p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-5 rounded-md bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (images.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
+      >
+        <div className="max-w-sm text-center">
+          <p className="text-base font-semibold text-white">No images found</p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-5 rounded-md bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
       </motion.div>
     );
   }
@@ -205,8 +289,8 @@ export default function ImageViewer({
                   className="absolute inset-0"
                 >
                   <Image
-                    src={images[currentIndex]}
-                    alt={`${project.title} – ${currentIndex + 1}`}
+                    src={images[activeIndex]}
+                    alt={`${project.title} – ${activeIndex + 1}`}
                     fill
                     className="object-contain"
                     priority
@@ -244,7 +328,7 @@ export default function ImageViewer({
                 <AnimatePresence>
                   {visibleImages.map((src, idx) => {
                     const originalIndex = visibleStart + idx;
-                    const isActive = originalIndex === currentIndex;
+                    const isActive = originalIndex === activeIndex;
                     return (
                       <motion.button
                         key={originalIndex}

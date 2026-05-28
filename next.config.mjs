@@ -4,11 +4,16 @@
  */
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "64mb",
+    },
+  },
   images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "vseehvj7twlup2mp.public.blob.vercel-storage.com",
+        hostname: "coloiwvo00tghivx.public.blob.vercel-storage.com",
       },
     ],
   },

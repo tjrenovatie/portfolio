@@ -3,24 +3,26 @@
 
 import { useState, useEffect } from "react";
 
-interface ProjectImageCache {
-  data: Record<string, string[]>;
-}
+type ProjectsApiProject = {
+  id: string;
+  imageUrls?: string[];
+};
 
 export function useProjectImages(prefix: string | null) {
-  const [images, setImages] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [imageCache, setImageCache] = useState<Record<string, string[]>>({});
+  const [error, setError] = useState<{
+    message: string;
+    prefix: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!prefix) {
-      setImages([]);
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    fetch("/api/project-images/all", { next: { revalidate: 86400 } })
+    let ignore = false;
+
+    fetch("/api/projects", { next: { revalidate: 3600 } })
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch");
@@ -28,12 +30,46 @@ export function useProjectImages(prefix: string | null) {
 
         return res.json();
       })
-      .then(({ data }: { data: ProjectImageCache["data"] }) => {
-        setImages(data[prefix] || []);
+      .then(({ data }: { data: ProjectsApiProject[] }) => {
+        if (ignore) return;
+
+        const databaseProject = data.find((project) => project.id === prefix);
+
+        if (databaseProject) {
+          setImageCache((currentCache) => ({
+            ...currentCache,
+            [prefix]: databaseProject.imageUrls ?? [],
+          }));
+          return;
+        }
+
+        setImageCache((currentCache) => ({
+          ...currentCache,
+          [prefix]: [],
+        }));
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (ignore) return;
+
+        setImageCache((currentCache) => ({
+          ...currentCache,
+          [prefix]: [],
+        }));
+
+        setError({ message: err.message, prefix });
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, [prefix]);
 
-  return { images, loading, error };
+  const hasCachedImages = Boolean(prefix && prefix in imageCache);
+  const currentError = error?.prefix === prefix ? error.message : null;
+
+  return {
+    images: prefix ? imageCache[prefix] ?? [] : [],
+    loading: Boolean(prefix && !hasCachedImages && !currentError),
+    error: currentError,
+  };
 }

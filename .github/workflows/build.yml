@@ -12,43 +12,60 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      VERCEL_ENV: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
       - name: Configure Git author for Vercel
         run: |
-          git config --global user.name "andante-ray0s-7071"
-          git config --global user.email "andante-ray.0s@icloud.com"
+          git config --global user.name "tjrenovatie"
+          git config --global user.email "info@tj-renovatie.nl"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Debug – List Vercel domains for this scope
+        run: |
+          echo "Listing domains for scope: ${{ secrets.VERCEL_ORG_ID }}"
+          vercel domains ls \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Debug – List Vercel projects for this scope
+        run: |
+          vercel projects ls \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --scope=${{ secrets.VERCEL_ORG_ID }}
 
       - name: Build & Deploy Project Artifacts to Preview
         if: ${{ inputs.environment == 'preview' }}
         run: |
-          vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --target=preview --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
           url="$(vercel deploy --prebuilt --yes \
             --token=${{ secrets.VERCEL_TOKEN }} \
-            --scope=${{ secrets.VERCEL_TEAM_SLUG }})"
-          vercel alias --token=${{ secrets.VERCEL_TOKEN }} set "$url" dev.tj-renovatie.nl
+            --scope=${{ secrets.VERCEL_ORG_ID }})"
+          echo "Deploying to URL: $url"
+          vercel alias --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} set "$url" dev.tj-renovatie.nl
           echo "Deployed to URL: $url"
 
       - name: Deploy Project Artifacts to Production
         if: ${{ inputs.environment == 'production' }}
         run: |
-          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-          url="$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})"
-          vercel alias --token=${{ secrets.VERCEL_TOKEN }} set "$url" tj-renovatie.nl
+          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+          url="$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }})"
+          vercel alias --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }} set "$url" tj-renovatie.nl
           echo "Deployed to URL: $url"

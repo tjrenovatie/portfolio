@@ -4,7 +4,8 @@ export interface Project {
   title: string;
   /** width / height – e.g. 1.5 = 3:2 */
   repAspect: number;
-  blobPrefix: string;
+  blobPrefix?: string;
+  imageUrls?: string[];
 }
 
 export const projects = [

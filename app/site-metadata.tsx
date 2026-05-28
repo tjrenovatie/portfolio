@@ -5,7 +5,7 @@ export const siteMetadata = (
       href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
     />
-    <link rel="preload" as="image" href="/assets/img/marble-dark.png" />
+    <link rel="preload" as="image" href="/assets/img/marble-dark.avif" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <meta name="apple-mobile-web-app-capable" content="yes" />
