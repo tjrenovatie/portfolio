@@ -43,8 +43,8 @@ jobs:
 
       - name: Validate database migration environment
         run: |
-          if ! grep -Eq '^(DATABASE_URL|POSTGRES_URL)=' .env.migrate.local; then
-            echo "DATABASE_URL or POSTGRES_URL is missing from the ${{ inputs.environment }} Vercel environment."
+          if ! node --env-file=.env.migrate.local -e "const url = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); process.exit(url ? 0 : 1)"; then
+            echo "DATABASE_URL or POSTGRES_URL is missing or empty in the ${{ inputs.environment }} Vercel environment."
             exit 1
           fi
 

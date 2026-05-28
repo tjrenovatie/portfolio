@@ -2,7 +2,8 @@ import { readFile, readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { neon } from "@neondatabase/serverless";
 
-const databaseUrl = process.env.DATABASE_URL ?? process.env.POSTGRES_URL;
+const databaseUrl =
+  process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
 
 if (!databaseUrl) {
   throw new Error("DATABASE_URL or POSTGRES_URL must be set.");
