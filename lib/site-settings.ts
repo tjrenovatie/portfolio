@@ -2,6 +2,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { sql } from "@/lib/db";
 
 const WEBSITE_DISPLAY_SETTING_KEY = "website_display_enabled";
+const WEBSITE_DISPLAY_DEFAULT_ENABLED = false;
 
 type SiteSettingRow = {
   value: string;
@@ -30,11 +31,14 @@ export async function getWebsiteDisplayEnabled() {
       LIMIT 1
     `) as SiteSettingRow[];
 
-    return parseBooleanSetting(rows[0]?.value, true);
+    return parseBooleanSetting(
+      rows[0]?.value,
+      WEBSITE_DISPLAY_DEFAULT_ENABLED,
+    );
   } catch (error) {
     console.error("Failed to load website display setting:", error);
 
-    return true;
+    return WEBSITE_DISPLAY_DEFAULT_ENABLED;
   }
 }
 
@@ -48,5 +52,5 @@ export async function setWebsiteDisplayEnabled(enabled: boolean) {
     RETURNING value
   `) as SiteSettingRow[];
 
-  return parseBooleanSetting(rows[0]?.value, true);
+  return parseBooleanSetting(rows[0]?.value, WEBSITE_DISPLAY_DEFAULT_ENABLED);
 }
