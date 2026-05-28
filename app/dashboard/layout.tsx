@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import {
   ChartBarIcon,
+  EnvelopeIcon,
   IdentificationIcon,
   FolderIcon,
   HomeIcon,
@@ -21,6 +22,7 @@ import { DASHBOARD_LOGIN_PATH } from "@/lib/dashboard-auth-routes";
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: ChartBarIcon },
+  { name: "Messages", href: "/dashboard/messages", icon: EnvelopeIcon },
   { name: "About", href: "/dashboard/about", icon: IdentificationIcon },
   { name: "Projects", href: "/dashboard/projects", icon: FolderIcon },
   { name: "Images", href: "/dashboard/images", icon: PhotoIcon },
