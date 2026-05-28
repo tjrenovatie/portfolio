@@ -8,6 +8,15 @@ on:
         required: true
         type: string
         default: "preview"
+    secrets:
+      VERCEL_TOKEN:
+        required: true
+      VERCEL_ORG_ID:
+        required: true
+      DATABASE_URL:
+        required: false
+      POSTGRES_URL:
+        required: false
 
 jobs:
   deploy:
@@ -65,6 +74,7 @@ jobs:
             echo "Using database URL from the GitHub ${{ inputs.environment }} environment POSTGRES_URL secret."
           else
             echo "DATABASE_URL or POSTGRES_URL is missing or empty in the pulled Vercel env files and GitHub ${{ inputs.environment }} environment secrets."
+            echo "Add POSTGRES_URL or DATABASE_URL to GitHub Settings > Environments > ${{ inputs.environment }} > Environment secrets, or make sure Vercel exposes the variable to the ${{ inputs.environment }} environment."
             exit 1
           fi
 
