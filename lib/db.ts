@@ -76,6 +76,20 @@ export type ProjectImageRecord = {
   createdAt: Date;
 };
 
+export type SiteImageRecord = {
+  key: string;
+  blobUrl: string;
+  blobDownloadUrl: string | null;
+  blobPathname: string;
+  blobContentType: string;
+  blobSize: number | null;
+  width: number | null;
+  height: number | null;
+  altText: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type PublicProjectImage = Pick<
   ProjectImageRecord,
   | "id"

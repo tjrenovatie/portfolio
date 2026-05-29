@@ -7,8 +7,7 @@ import {
   MotionP,
   MotionSection,
 } from "@/components/motion";
-import { getProfileImageBlobPath } from "@/lib/blob-paths";
-import { getFirstBlobUrl } from "@/lib/vercel-blob";
+import { getProfileImage } from "@/lib/site-images";
 
 const contactHighlights = [
   "Vrijblijvend meedenken",
@@ -64,14 +63,15 @@ const contactSectionVariants: Variants = {
 };
 
 const About = async () => {
-  const profileSrc = await getFirstBlobUrl(
-    getProfileImageBlobPath(),
-    "/assets/img/profile/profile-image.avif",
-  );
+  const profileImage = await getProfileImage();
 
   return (
     <article className="bg-white text-neutral-900">
-      <section className="mx-auto grid max-w-7xl items-start gap-10 px-5 py-12 md:grid-cols-[1.05fr_0.95fr] md:py-14 lg:items-center lg:px-8 lg:py-16">
+      <section
+        className={`mx-auto grid max-w-7xl items-start gap-10 px-5 py-12 md:py-14 lg:items-center lg:px-8 lg:py-16 ${
+          profileImage ? "md:grid-cols-[1.05fr_0.95fr]" : ""
+        }`}
+      >
         <MotionDiv
           className="max-w-2xl select-text"
           initial="hidden"
@@ -111,28 +111,30 @@ const About = async () => {
           </MotionDiv>
         </MotionDiv>
 
-        <MotionDiv
-          className="relative h-[26rem] overflow-hidden rounded-lg shadow-xl md:h-[34rem]"
-          initial="hidden"
-          animate="visible"
-          variants={revealRight}
-        >
-          <Image
-            src={profileSrc}
-            alt="Thurston Joseph"
-            fill
-            className="profile-image"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-7">
-            <p className="eyebrow eyebrow-light">Thurston Joseph</p>
-            <p className="mt-2 max-w-md text-base leading-7 text-white">
-              Persoonlijk contact, duidelijke communicatie en aandacht voor het
-              werk op locatie.
-            </p>
-          </div>
-        </MotionDiv>
+        {profileImage && (
+          <MotionDiv
+            className="relative h-[26rem] overflow-hidden rounded-lg shadow-xl md:h-[34rem]"
+            initial="hidden"
+            animate="visible"
+            variants={revealRight}
+          >
+            <Image
+              src={profileImage.blobUrl}
+              alt={profileImage.altText ?? "Thurston Joseph"}
+              fill
+              className="profile-image"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-7">
+              <p className="eyebrow eyebrow-light">Thurston Joseph</p>
+              <p className="mt-2 max-w-md text-base leading-7 text-white">
+                Persoonlijk contact, duidelijke communicatie en aandacht voor het
+                werk op locatie.
+              </p>
+            </div>
+          </MotionDiv>
+        )}
       </section>
 
       <MotionSection

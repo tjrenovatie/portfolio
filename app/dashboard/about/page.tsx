@@ -1,7 +1,6 @@
 import Image from "next/image";
-import { getProfileImageBlobPath } from "@/lib/blob-paths";
 import { dashboardNoIndexMetadata } from "@/lib/dashboard-seo";
-import { getFirstBlobUrl } from "@/lib/vercel-blob";
+import { getProfileImage } from "@/lib/site-images";
 import ProfileImageUploadForm from "./ProfileImageUploadForm";
 
 export const metadata = dashboardNoIndexMetadata;
@@ -9,10 +8,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export default async function DashboardAboutPage() {
-  const profileSrc = await getFirstBlobUrl(
-    getProfileImageBlobPath(),
-    "/assets/img/profile/profile-image.avif",
-  );
+  const profileImage = await getProfileImage();
 
   return (
     <article className="space-y-6">
@@ -33,13 +29,19 @@ export default async function DashboardAboutPage() {
       <section className="grid gap-6 lg:grid-cols-[22rem_1fr]">
         <div className="rounded-md border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
           <div className="relative h-96 overflow-hidden rounded-md bg-neutral-100 dark:bg-neutral-950">
-            <Image
-              src={profileSrc}
-              alt="Current profile image"
-              fill
-              className="object-cover"
-              priority
-            />
+            {profileImage ? (
+              <Image
+                src={profileImage.blobUrl}
+                alt={profileImage.altText ?? "Current profile image"}
+                fill
+                className="object-cover"
+                priority
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center px-5 text-center text-sm font-semibold text-neutral-500 dark:text-neutral-400">
+                No profile image uploaded
+              </div>
+            )}
           </div>
         </div>
 

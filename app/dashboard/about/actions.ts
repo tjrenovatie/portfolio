@@ -12,6 +12,7 @@ import {
   MAX_THUMBNAIL_IMAGE_SIZE,
   validateUploadImage,
 } from "@/lib/image-processing";
+import { upsertProfileImage } from "@/lib/site-images";
 
 export type UploadProfileImageState = {
   fieldErrors?: {
@@ -84,12 +85,22 @@ export async function uploadProfileImageAction(
       contentType: profileImage.contentType,
       token,
     });
+    const savedImage = await upsertProfileImage({
+      altText: image.name,
+      blobContentType: blob.contentType ?? "image/avif",
+      blobDownloadUrl: blob.downloadUrl ?? null,
+      blobPathname: blob.pathname,
+      blobSize: profileImage.outputSize,
+      blobUrl: blob.url,
+      height: profileImage.height,
+      width: profileImage.width,
+    });
 
     revalidatePath("/about");
     revalidatePath("/dashboard/about");
 
     return {
-      imageUrl: blob.url,
+      imageUrl: savedImage.blobUrl,
       message: "Profile image uploaded.",
       status: "success",
     };

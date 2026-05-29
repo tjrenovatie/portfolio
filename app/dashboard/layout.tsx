@@ -11,7 +11,6 @@ import {
   FolderIcon,
   HomeIcon,
   RectangleGroupIcon,
-  PhotoIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import {
@@ -22,10 +21,9 @@ import { DASHBOARD_LOGIN_PATH } from "@/lib/dashboard-auth-routes";
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: ChartBarIcon },
-  { name: "Messages", href: "/dashboard/messages", icon: EnvelopeIcon },
   { name: "About", href: "/dashboard/about", icon: IdentificationIcon },
   { name: "Projects", href: "/dashboard/projects", icon: FolderIcon },
-  { name: "Images", href: "/dashboard/images", icon: PhotoIcon },
+  { name: "Email template", href: "/dashboard/messages", icon: EnvelopeIcon },
   {
     name: "Settings",
     href: "/dashboard/settings",
