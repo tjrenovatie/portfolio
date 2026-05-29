@@ -13,10 +13,6 @@ on:
         required: true
       VERCEL_ORG_ID:
         required: true
-      DATABASE_URL:
-        required: false
-      POSTGRES_URL:
-        required: false
 
 jobs:
   deploy:
@@ -47,46 +43,22 @@ jobs:
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
 
-      - name: Pull migration environment variables
-        run: vercel env pull .env.migrate.local --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
-
-      - name: Prepare database migration environment
-        env:
-          MIGRATION_DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          MIGRATION_POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
-        run: |
-          touch .env.migrate.local
-
-          has_valid_database_url() {
-            node --env-file="$1" -e "const raw = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); if (!raw) process.exit(1); const url = raw.replace(/^(DATABASE_URL|POSTGRES_URL)=/, '').replace(/^[\"']|[\"']$/g, '').trim(); try { const parsed = new URL(url); process.exit(['postgres:', 'postgresql:'].includes(parsed.protocol) ? 0 : 1); } catch { process.exit(1); }" 2>/dev/null
-          }
-
-          if has_valid_database_url ".env.migrate.local"; then
-            echo "Using database URL from .env.migrate.local."
-          elif [ -f ".vercel/.env.${{ inputs.environment }}.local" ] && has_valid_database_url ".vercel/.env.${{ inputs.environment }}.local"; then
-            cp ".vercel/.env.${{ inputs.environment }}.local" ".env.migrate.local"
-            echo "Using database URL from .vercel/.env.${{ inputs.environment }}.local."
-          elif [ -n "${MIGRATION_DATABASE_URL}" ]; then
-            printf "\nDATABASE_URL=%s\n" "${MIGRATION_DATABASE_URL}" >> .env.migrate.local
-            echo "Using database URL from the GitHub ${{ inputs.environment }} environment DATABASE_URL secret."
-          elif [ -n "${MIGRATION_POSTGRES_URL}" ]; then
-            printf "\nPOSTGRES_URL=%s\n" "${MIGRATION_POSTGRES_URL}" >> .env.migrate.local
-            echo "Using database URL from the GitHub ${{ inputs.environment }} environment POSTGRES_URL secret."
-          else
-            echo "DATABASE_URL or POSTGRES_URL is missing or empty in the pulled Vercel env files and GitHub ${{ inputs.environment }} environment secrets."
-            echo "Add POSTGRES_URL or DATABASE_URL to GitHub Settings > Environments > ${{ inputs.environment }} > Environment secrets, or make sure Vercel exposes the variable to the ${{ inputs.environment }} environment."
-            exit 1
-          fi
-
       - name: Validate database migration environment
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || vars.DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL || vars.POSTGRES_URL }}
         run: |
-          if ! node --env-file=.env.migrate.local -e "const raw = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); if (!raw) process.exit(1); const url = raw.replace(/^(DATABASE_URL|POSTGRES_URL)=/, '').replace(/^[\"']|[\"']$/g, '').trim(); try { const parsed = new URL(url); process.exit(['postgres:', 'postgresql:'].includes(parsed.protocol) ? 0 : 1); } catch { process.exit(1); }"; then
-            echo "DATABASE_URL or POSTGRES_URL is missing, empty, or not a valid Postgres URL in the prepared migration environment."
+          if ! node -e "const raw = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); if (!raw) process.exit(1); const url = raw.replace(/^(DATABASE_URL|POSTGRES_URL)=/, '').replace(/^[\"']|[\"']$/g, '').trim(); try { const parsed = new URL(url); process.exit(['postgres:', 'postgresql:'].includes(parsed.protocol) ? 0 : 1); } catch { process.exit(1); }"; then
+            echo "DATABASE_URL or POSTGRES_URL is missing, empty, or not a valid Postgres URL in the GitHub ${{ inputs.environment }} environment."
+            echo "Add DATABASE_URL or POSTGRES_URL to GitHub Settings > Environments > ${{ inputs.environment }} as an environment secret or variable."
             exit 1
           fi
 
       - name: Run database migrations
-        run: node --env-file=.env.migrate.local scripts/migrate-db.mjs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || vars.DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL || vars.POSTGRES_URL }}
+        run: node scripts/migrate-db.mjs
 
       - name: Debug – List Vercel domains for this scope
         run: |
