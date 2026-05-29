@@ -31,10 +31,7 @@ export async function getWebsiteDisplayEnabled() {
       LIMIT 1
     `) as SiteSettingRow[];
 
-    return parseBooleanSetting(
-      rows[0]?.value,
-      WEBSITE_DISPLAY_DEFAULT_ENABLED,
-    );
+    return parseBooleanSetting(rows[0]?.value, WEBSITE_DISPLAY_DEFAULT_ENABLED);
   } catch (error) {
     console.error("Failed to load website display setting:", error);
 
