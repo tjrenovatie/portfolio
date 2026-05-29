@@ -1,10 +1,33 @@
 import PhotoGallery, { type PhotoGalleryItem } from "@/components/PhotoGallery";
+import { MotionDiv, MotionH1, MotionP } from "@/components/motion";
 import { getPublicProjects } from "@/lib/db-projects";
 import { projects as fallbackProjects } from "@/lib/projects";
 import { getFirstBlobUrl } from "@/lib/vercel-blob";
+import type { Variants } from "framer-motion";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+
+const containerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
+
+const revealUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
 
 async function getGalleryImages() {
   try {
@@ -52,19 +75,34 @@ export default async function ProjectsPage() {
   const galleryImages = await getGalleryImages();
 
   return (
-    <article className="min-h-screen w-full bg-[#f7f5f1] px-4 py-10 text-[--color-primary-title] sm:px-6 lg:px-8">
-      <div className="mx-auto mb-10 max-w-[1720px]">
-        <header className="mx-auto mb-12 max-w-3xl text-center">
-          <span className="eyebrow">Portfolio</span>
-          <h1 className="mt-3 text-4xl font-bold">Onze Projecten</h1>
-          <p className="mt-4 text-base leading-7 text-neutral-600 sm:text-lg">
+    <article className="min-h-screen w-full bg-[#f7f5f1] text-[--color-primary-title]">
+      <section className="mx-auto max-w-7xl px-5 pb-20 pt-12 sm:px-8 sm:pt-20">
+        <MotionDiv
+          className="mb-12 max-w-3xl select-text"
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          <MotionP className="eyebrow mb-4" variants={revealUp}>
+            Portfolio
+          </MotionP>
+          <MotionH1
+            className="mb-5 text-[--color-primary-title]"
+            variants={revealUp}
+          >
+            Onze Projecten
+          </MotionH1>
+          <MotionP
+            className="max-w-2xl text-base leading-8 text-neutral-700 sm:text-lg"
+            variants={revealUp}
+          >
             Een selectie van afgeronde renovaties, badkamers, keukens en
             interieurs.
-          </p>
-        </header>
+          </MotionP>
+        </MotionDiv>
 
         <PhotoGallery images={galleryImages} />
-      </div>
+      </section>
     </article>
   );
 }
