@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useLayoutEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
@@ -18,6 +19,26 @@ export default function PublicShell({
   const { isHome, pathname } = useCurrentPage();
   const isDashboard = pathname.startsWith("/dashboard");
   const sectionSpacing = isHome ? "mt-0" : "mt-20";
+
+  useLayoutEffect(() => {
+    if (isDashboard) return;
+
+    const html = document.documentElement;
+    const previousScrollBehavior = html.style.scrollBehavior;
+
+    html.style.scrollBehavior = "auto";
+    window.scrollTo({ left: 0, top: 0, behavior: "auto" });
+
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo({ left: 0, top: 0, behavior: "auto" });
+      html.style.scrollBehavior = previousScrollBehavior;
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      html.style.scrollBehavior = previousScrollBehavior;
+    };
+  }, [isDashboard, pathname]);
 
   if (isDashboard) {
     return children;
