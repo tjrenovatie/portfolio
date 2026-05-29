@@ -1,5 +1,6 @@
 export { DashboardButton, DashboardButtonLink } from "./Button";
 export { DashboardDialog } from "./Dialog";
+export { DashboardDrawer } from "./Drawer";
 export { DashboardEmailTemplatePreview } from "./EmailTemplatePreview";
 export { DashboardFileInput } from "./FileInput";
 export { DashboardGoogleLoginButton } from "./GoogleLoginButton";
