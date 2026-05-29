@@ -1,4 +1,6 @@
-import PhotoGallery, { type PhotoGalleryItem } from "@/components/PhotoGallery";
+import PhotoGallery, {
+  type PhotoGalleryProject,
+} from "@/components/PhotoGallery";
 import { MotionDiv, MotionH1, MotionP } from "@/components/motion";
 import { getPublicProjects } from "@/lib/db-projects";
 import { projects as fallbackProjects } from "@/lib/projects";
@@ -29,29 +31,30 @@ const revealUp: Variants = {
   },
 };
 
-async function getGalleryImages() {
+async function getGalleryProjects() {
   try {
     const databaseProjects = await getPublicProjects();
-    const galleryImages = databaseProjects.flatMap<PhotoGalleryItem>(
-      (project) =>
-        project.images
+    const galleryProjects = databaseProjects
+      .map<PhotoGalleryProject>((project) => ({
+        id: project.id,
+        title: project.name,
+        images: project.images
           .filter((image) => image.blobUrl.trim().length > 0)
           .map((image) => ({
             id: image.id,
             src: image.blobUrl,
             alt: image.altText?.trim() || project.name,
-            title: project.name,
-            description: project.description,
             width: image.width ?? 1200,
             height: image.height ?? 900,
           })),
-    );
+      }))
+      .filter((project) => project.images.length > 0);
 
-    if (galleryImages.length > 0) {
-      return galleryImages;
+    if (galleryProjects.length > 0) {
+      return galleryProjects;
     }
   } catch (error) {
-    console.error("Failed to load database gallery images:", error);
+    console.error("Failed to load database gallery projects:", error);
   }
 
   return Promise.all(
@@ -60,19 +63,23 @@ async function getGalleryImages() {
 
       return {
         id: project.id,
-        src: await getFirstBlobUrl(project.blobPrefix, "/fallback.avif"),
-        alt: project.title,
         title: project.title,
-        description: "Bekijk dit afgeronde renovatieproject van TJ Renovatie.",
-        width,
-        height: Math.round(width / project.repAspect),
-      } satisfies PhotoGalleryItem;
+        images: [
+          {
+            id: `${project.id}-cover`,
+            src: await getFirstBlobUrl(project.blobPrefix, "/fallback.avif"),
+            alt: project.title,
+            width,
+            height: Math.round(width / project.repAspect),
+          },
+        ],
+      } satisfies PhotoGalleryProject;
     }),
   );
 }
 
 export default async function ProjectsPage() {
-  const galleryImages = await getGalleryImages();
+  const galleryProjects = await getGalleryProjects();
 
   return (
     <article className="min-h-screen w-full bg-[#f7f5f1] text-[--color-primary-title]">
@@ -101,7 +108,7 @@ export default async function ProjectsPage() {
           </MotionP>
         </MotionDiv>
 
-        <PhotoGallery images={galleryImages} />
+        <PhotoGallery projects={galleryProjects} />
       </section>
     </article>
   );

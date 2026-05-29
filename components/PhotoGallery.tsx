@@ -15,12 +15,16 @@ export type PhotoGalleryItem = {
   alt: string;
   width: number;
   height: number;
-  description?: string;
-  title?: string;
+};
+
+export type PhotoGalleryProject = {
+  id: string;
+  title: string;
+  images: PhotoGalleryItem[];
 };
 
 type PhotoGalleryProps = {
-  images: PhotoGalleryItem[];
+  projects: PhotoGalleryProject[];
 };
 
 type GalleryLayout = {
@@ -30,8 +34,8 @@ type GalleryLayout = {
 
 type GalleryColumnItem = {
   displayAspectRatio: number;
-  image: PhotoGalleryItem;
   index: number;
+  project: PhotoGalleryProject;
 };
 
 function getDisplayAspectRatio(index: number) {
@@ -48,8 +52,11 @@ function getColumnCount(width: number) {
   return 2;
 }
 
-export default function PhotoGallery({ images }: PhotoGalleryProps) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+export default function PhotoGallery({ projects }: PhotoGalleryProps) {
+  const [activeProjectIndex, setActiveProjectIndex] = useState<number | null>(
+    null,
+  );
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [layout, setLayout] = useState<GalleryLayout>({
     columnCount: 2,
     gapRatio: 0,
@@ -58,7 +65,15 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
   const galleryRef = useRef<HTMLDivElement | null>(null);
   const triggerRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const touchStartRef = useRef<number | null>(null);
-  const activeImage = activeIndex === null ? null : images[activeIndex];
+
+  const visibleProjects = useMemo(
+    () => projects.filter((project) => project.images.length > 0),
+    [projects],
+  );
+  const activeProject =
+    activeProjectIndex === null ? null : visibleProjects[activeProjectIndex];
+  const activeImages = activeProject?.images ?? [];
+  const activeImage = activeImages[activeImageIndex] ?? null;
 
   const columns = useMemo(() => {
     const nextColumns = Array.from({ length: layout.columnCount }, () => ({
@@ -66,7 +81,7 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
       items: [] as GalleryColumnItem[],
     }));
 
-    images.forEach((image, index) => {
+    visibleProjects.forEach((project, index) => {
       const displayAspectRatio = getDisplayAspectRatio(index);
       const shortestColumn = nextColumns.reduce(
         (shortest, column, columnIndex) =>
@@ -76,15 +91,15 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
 
       nextColumns[shortestColumn].items.push({
         displayAspectRatio,
-        image,
         index,
+        project,
       });
       nextColumns[shortestColumn].height +=
         1 / displayAspectRatio +
         (nextColumns[shortestColumn].items.length > 1 ? layout.gapRatio : 0);
     });
 
-    const targetHeight = Math.max(...nextColumns.map((column) => column.height));
+    const targetHeight = Math.max(0, ...nextColumns.map((column) => column.height));
 
     return nextColumns.map((column) => {
       if (column.items.length === 0 || column.height === targetHeight) {
@@ -103,7 +118,7 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
 
       return items;
     });
-  }, [images, layout.columnCount, layout.gapRatio]);
+  }, [layout.columnCount, layout.gapRatio, visibleProjects]);
 
   useEffect(() => {
     const updateLayout = () => {
@@ -133,33 +148,36 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
   }, []);
 
   const closeLightbox = useCallback(() => {
-    const trigger = activeIndex === null ? null : triggerRefs.current[activeIndex];
-    setActiveIndex(null);
+    const trigger =
+      activeProjectIndex === null
+        ? null
+        : triggerRefs.current[activeProjectIndex];
+
+    setActiveProjectIndex(null);
+    setActiveImageIndex(0);
     window.setTimeout(() => trigger?.focus(), 0);
-  }, [activeIndex]);
+  }, [activeProjectIndex]);
 
   const showPrevious = useCallback(() => {
-    if (images.length < 2) return;
-    setDirection(-1);
-    setActiveIndex((index) => {
-      const current = index ?? 0;
+    if (activeImages.length < 2) return;
 
-      return current === 0 ? images.length - 1 : current - 1;
-    });
-  }, [images.length]);
+    setDirection(-1);
+    setActiveImageIndex((index) =>
+      index === 0 ? activeImages.length - 1 : index - 1,
+    );
+  }, [activeImages.length]);
 
   const showNext = useCallback(() => {
-    if (images.length < 2) return;
-    setDirection(1);
-    setActiveIndex((index) => {
-      const current = index ?? 0;
+    if (activeImages.length < 2) return;
 
-      return current === images.length - 1 ? 0 : current + 1;
-    });
-  }, [images.length]);
+    setDirection(1);
+    setActiveImageIndex((index) =>
+      index === activeImages.length - 1 ? 0 : index + 1,
+    );
+  }, [activeImages.length]);
 
   useEffect(() => {
-    if (activeIndex === null) return;
+    if (!activeProject || !activeImage) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -182,7 +200,7 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeIndex, closeLightbox, showNext, showPrevious]);
+  }, [activeImage, activeProject, closeLightbox, showNext, showPrevious]);
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     touchStartRef.current = event.touches[0].clientX;
@@ -203,7 +221,7 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
     }
   };
 
-  if (images.length === 0) {
+  if (visibleProjects.length === 0) {
     return (
       <div className="rounded-2xl border border-neutral-200 bg-white px-6 py-12 text-center shadow-sm">
         <p className="text-base font-semibold text-neutral-700">
@@ -224,69 +242,73 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
             key={columnIndex}
             className="flex h-full flex-col gap-3 sm:gap-4"
           >
-            {column.map(({ displayAspectRatio, image, index }) => (
-            <motion.figure
-              key={image.id}
-              initial={{ opacity: 0, y: 22 }}
-              transition={{
-                delay: (index % 8) * 0.035,
-                duration: 0.55,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              viewport={{ amount: 0.2, once: true }}
-              whileInView={{ opacity: 1, y: 0 }}
-              className="break-inside-avoid"
-            >
-              <button
-                ref={(node) => {
-                  triggerRefs.current[index] = node;
-                }}
-                type="button"
-                onClick={() => {
-                  setDirection(0);
-                  setActiveIndex(index);
-                }}
-                className="group relative block w-full overflow-hidden rounded-[1.25rem] border border-white/70 bg-neutral-200 text-left shadow-[0_18px_45px_rgba(28,25,23,0.12)] outline-none ring-1 ring-black/[0.03] transition duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(28,25,23,0.22)] focus-visible:ring-2 focus-visible:ring-[--color-primary] focus-visible:ring-offset-4 focus-visible:ring-offset-neutral-50"
-                aria-label={`Open foto ${index + 1}: ${image.alt}`}
-              >
-                <span
-                  className="relative block w-full overflow-hidden"
-                  style={{ aspectRatio: `${displayAspectRatio} / 1` }}
+            {column.map(({ displayAspectRatio, index, project }) => {
+              const coverImage = project.images[0];
+
+              return (
+                <motion.figure
+                  key={project.id}
+                  initial={{ opacity: 0, y: 22 }}
+                  transition={{
+                    delay: (index % 8) * 0.035,
+                    duration: 0.55,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  viewport={{ amount: 0.2, once: true }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  className="break-inside-avoid"
                 >
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    sizes="(min-width: 1536px) 18vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw"
-                    className="object-cover transition duration-700 ease-out group-hover:scale-[1.055]"
-                    loading="lazy"
-                  />
-                </span>
-                <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-white/10 opacity-75 transition duration-500 group-hover:opacity-90" />
-                <span className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/25 to-transparent opacity-60 transition duration-500 group-hover:opacity-80" />
-                {image.title ? (
-                  <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 p-2.5 sm:p-4">
-                    <div className="rounded-xl border border-white/20 bg-black/45 px-2.5 py-2 text-white shadow-[0_12px_32px_rgba(0,0,0,0.28)] backdrop-blur-md transition duration-500 group-hover:bg-black/55 sm:rounded-2xl sm:px-4 sm:py-2.5">
-                      <span className="block max-w-full break-words text-[clamp(0.72rem,2.8vw,0.95rem)] font-semibold leading-snug tracking-[0.01em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
-                        {image.title}
-                      </span>
-                    </div>
-                  </figcaption>
-                ) : null}
-              </button>
-            </motion.figure>
-            ))}
+                  <button
+                    ref={(node) => {
+                      triggerRefs.current[index] = node;
+                    }}
+                    type="button"
+                    onClick={() => {
+                      setDirection(0);
+                      setActiveImageIndex(0);
+                      setActiveProjectIndex(index);
+                    }}
+                    className="group relative block w-full overflow-hidden rounded-[1.25rem] border border-white/70 bg-neutral-200 text-left shadow-[0_18px_45px_rgba(28,25,23,0.12)] outline-none ring-1 ring-black/[0.03] transition duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(28,25,23,0.22)] focus-visible:ring-2 focus-visible:ring-[--color-primary] focus-visible:ring-offset-4 focus-visible:ring-offset-neutral-50"
+                    aria-label={`Open project ${project.title}`}
+                  >
+                    <span
+                      className="relative block w-full overflow-hidden"
+                      style={{ aspectRatio: `${displayAspectRatio} / 1` }}
+                    >
+                      <Image
+                        src={coverImage.src}
+                        alt={coverImage.alt}
+                        fill
+                        sizes="(min-width: 1536px) 18vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw"
+                        className="object-cover transition duration-700 ease-out group-hover:scale-[1.055]"
+                        loading="lazy"
+                      />
+                    </span>
+                    <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-white/10 opacity-75 transition duration-500 group-hover:opacity-90" />
+                    <span className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/25 to-transparent opacity-60 transition duration-500 group-hover:opacity-80" />
+                    <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 p-2.5 sm:p-4">
+                      <div className="rounded-xl border border-white/20 bg-black/45 px-2.5 py-2 text-white shadow-[0_12px_32px_rgba(0,0,0,0.28)] backdrop-blur-md transition duration-500 group-hover:bg-black/55 sm:rounded-2xl sm:px-4 sm:py-2.5">
+                        <span className="block max-w-full break-words text-[clamp(0.72rem,2.8vw,0.95rem)] font-semibold leading-snug tracking-[0.01em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
+                          {project.title}
+                        </span>
+                      </div>
+                    </figcaption>
+                  </button>
+                </motion.figure>
+              );
+            })}
           </div>
         ))}
       </div>
 
       <AnimatePresence>
-        {activeImage && activeIndex !== null ? (
+        {activeProject && activeImage ? (
           <motion.div
             aria-modal="true"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/96 px-4 py-6 backdrop-blur-md sm:px-8"
+            className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-neutral-950 px-4 py-6 sm:px-8"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             onClick={(event) => {
               if (event.target === event.currentTarget) {
                 closeLightbox();
@@ -296,8 +318,27 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
             onTouchStart={handleTouchStart}
             role="dialog"
           >
+            <div className="pointer-events-none absolute inset-0">
+              <Image
+                src={activeImage.src}
+                alt=""
+                fill
+                aria-hidden="true"
+                sizes="100vw"
+                className="scale-110 object-cover opacity-25 blur-2xl"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/90" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12),transparent_48%)]" />
+            </div>
+
             <div className="absolute left-4 top-4 z-20 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-sm font-semibold text-white/80 shadow-lg backdrop-blur sm:left-6 sm:top-6">
-              {activeIndex + 1} / {images.length}
+              {activeImageIndex + 1} / {activeImages.length}
+            </div>
+
+            <div className="absolute left-1/2 top-4 z-20 max-w-[min(58vw,640px)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/45 px-4 py-2 text-center shadow-lg backdrop-blur-md sm:top-6">
+              <p className="break-words text-sm font-semibold leading-snug text-white sm:text-base">
+                {activeProject.title}
+              </p>
             </div>
 
             <button
@@ -309,7 +350,7 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
               <XMarkIcon className="h-6 w-6" aria-hidden="true" />
             </button>
 
-            {images.length > 1 ? (
+            {activeImages.length > 1 ? (
               <>
                 <button
                   type="button"
@@ -330,42 +371,59 @@ export default function PhotoGallery({ images }: PhotoGalleryProps) {
               </>
             ) : null}
 
-            <AnimatePresence custom={direction} initial={false} mode="wait">
-              <motion.div
-                key={activeImage.id}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                className="relative h-[82vh] w-full max-w-7xl"
-                custom={direction}
-                exit={{
-                  opacity: 0,
-                  scale: 0.985,
-                  x: direction < 0 ? 42 : direction > 0 ? -42 : 0,
-                }}
-                initial={{
-                  opacity: 0,
-                  scale: 0.985,
-                  x: direction > 0 ? 42 : direction < 0 ? -42 : 0,
-                }}
-                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <Image
-                  src={activeImage.src}
-                  alt={activeImage.alt}
-                  fill
-                  priority
-                  sizes="100vw"
-                  className="object-contain drop-shadow-[0_30px_90px_rgba(0,0,0,0.62)]"
-                />
-              </motion.div>
-            </AnimatePresence>
+            <motion.div
+              key={activeImage.id}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              className="relative h-[70vh] w-full max-w-7xl sm:h-[76vh] lg:h-[82vh]"
+              initial={{
+                opacity: 0,
+                scale: 0.985,
+                x: direction > 0 ? 42 : direction < 0 ? -42 : 0,
+              }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Image
+                src={activeImage.src}
+                alt={activeImage.alt}
+                fill
+                priority
+                sizes="100vw"
+                className="object-contain drop-shadow-[0_30px_90px_rgba(0,0,0,0.62)]"
+              />
+            </motion.div>
 
-            {activeImage.title ? (
-              <div className="absolute bottom-5 left-1/2 z-20 w-[calc(100vw-2rem)] max-w-[760px] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/45 px-4 py-3 text-center text-white/90 shadow-[0_18px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:w-auto sm:min-w-72 sm:bg-white/10 sm:px-5">
-                <p className="break-words text-[clamp(0.875rem,3vw,1rem)] font-semibold leading-snug text-white">
-                  {activeImage.title}
-                </p>
+            <div className="absolute bottom-5 left-1/2 z-20 w-[calc(100vw-2rem)] max-w-4xl -translate-x-1/2 rounded-2xl border border-white/10 bg-black/45 p-2 shadow-[0_18px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+              <div className="flex gap-2 overflow-x-auto p-1">
+                {activeImages.map((projectImage, projectImageIndex) => {
+                  const isActive = projectImageIndex === activeImageIndex;
+
+                  return (
+                    <button
+                      key={projectImage.id}
+                      type="button"
+                      onClick={() => {
+                        setDirection(projectImageIndex > activeImageIndex ? 1 : -1);
+                        setActiveImageIndex(projectImageIndex);
+                      }}
+                      className={`relative h-14 w-20 flex-none overflow-hidden rounded-xl border transition sm:h-16 sm:w-24 ${
+                        isActive
+                          ? "border-white shadow-[0_0_0_2px_rgba(255,255,255,0.35)]"
+                          : "border-white/15 opacity-70 hover:opacity-100"
+                      }`}
+                      aria-label={`Bekijk foto ${projectImageIndex + 1} van ${activeProject.title}`}
+                    >
+                      <Image
+                        src={projectImage.src}
+                        alt={projectImage.alt}
+                        fill
+                        sizes="96px"
+                        className="object-cover"
+                      />
+                    </button>
+                  );
+                })}
               </div>
-            ) : null}
+            </div>
           </motion.div>
         ) : null}
       </AnimatePresence>
