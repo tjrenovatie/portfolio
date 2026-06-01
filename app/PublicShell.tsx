@@ -50,7 +50,7 @@ export default function PublicShell({
 
   return (
     <main className="flex flex-col items-center bg-gray-50">
-      <Header />
+      {!isHome && <Header />}
       <AnimatePresence mode="wait" initial={false}>
         <motion.section
           key={pathname}

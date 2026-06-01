@@ -2,12 +2,14 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Icon from "../components/icon";
 import { Socials } from "../lib/data";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Home = () => {
-  var [hasAnimated, setHasAnimated] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleAnimationComplete = () => {
     setHasAnimated(true);
@@ -34,6 +36,59 @@ const Home = () => {
         aria-label="Decorative background overlay for styling purposes"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
+
+      <button
+        type="button"
+        aria-label={isMenuOpen ? "Close main menu" : "Open main menu"}
+        aria-expanded={isMenuOpen}
+        aria-controls="home-mobile-navigation"
+        onClick={() => setIsMenuOpen((current) => !current)}
+        className="absolute right-4 top-4 z-30 flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-black/25 text-[--color-primary] shadow-lg shadow-black/20 backdrop-blur-md transition hover:border-white/40 hover:bg-black/35 hover:text-[--color-secondary] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-6 lg:hidden"
+      >
+        {isMenuOpen ? (
+          <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+        ) : (
+          <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+        )}
+      </button>
+
+      <AnimatePresence>
+        {isMenuOpen ? (
+          <>
+            <motion.div
+              className="fixed inset-0 z-20 bg-black/50 lg:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsMenuOpen(false)}
+            />
+            <motion.nav
+              id="home-mobile-navigation"
+              className="fixed inset-y-0 right-0 z-20 flex w-full flex-col justify-center bg-gray-950 px-6 shadow-2xl sm:w-80 lg:hidden"
+              initial={{ opacity: 0, x: "100%" }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: "100%" }}
+              transition={{ duration: 0.28, ease: "easeOut", type: "tween" }}
+              aria-label="Mobile navigation"
+            >
+              <ul className="flex flex-col items-center gap-8">
+                {navigationLinks.map((page) => (
+                  <li key={page.name} className="w-full max-w-xs">
+                    <Link
+                      href={page.url}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block rounded-lg py-3 text-center text-lg font-semibold text-white transition hover:bg-white/10 hover:text-[--color-primary]"
+                    >
+                      {page.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.nav>
+          </>
+        ) : null}
+      </AnimatePresence>
 
       {/* Logo Section */}
 
