@@ -6,9 +6,11 @@
 @tailwind utilities;
 
 html {
-  min-height: calc(100% + env(safe-area-inset-top));
-  padding: env(safe-area-inset-top) env(safe-area-inset-right)
-    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  min-height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  padding-left: 0;
+  padding-right: 0;
 }
 :root {
   --background-end-rgb: 255, 255, 255;
@@ -21,33 +23,37 @@ html {
   --color-secondary: #b04a48;
   --color-primary-title: #665700;
 
-  --safe-area-top: env(safe-area-inset-top, 20px);
-  --safe-area-left: env(safe-area-inset-left, 0px);
-  --safe-area-right: env(safe-area-inset-right, 0px);
-  --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @supports (-webkit-touch-callout: none) {
   :root {
-    --safe-area-top: env(safe-area-inset-top, 20px);
-    --safe-area-left: env(safe-area-inset-left, 0px);
-    --safe-area-right: env(safe-area-inset-right, 0px);
-    --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   body {
     padding-top: var(--safe-area-top);
-    padding-left: var(--safe-area-left);
-    padding-right: var(--safe-area-right);
     padding-bottom: var(--safe-area-bottom);
   }
 }
 
 body {
+  min-height: 100%;
+  width: 100%;
+  margin: 0;
+  overflow-x: hidden;
   padding-top: var(--safe-area-top);
-  padding-left: var(--safe-area-left);
-  padding-right: var(--safe-area-right);
+  padding-left: 0;
+  padding-right: 0;
   padding-bottom: var(--safe-area-bottom);
+}
+
+.public-shell {
+  width: var(--app-viewport-width, 100dvw);
+  max-width: none;
+  min-height: 100dvh;
 }
 
 body,

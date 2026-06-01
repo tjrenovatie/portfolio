@@ -1,9 +1,16 @@
 import "./globals.css";
 
 import React from "react";
+import type { Viewport } from "next";
 import { siteMetadata } from "./site-metadata";
 import PublicShell from "./PublicShell";
 import { getWebsiteDisplayEnabled } from "@/lib/site-settings";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export default async function RootLayout({
   children,

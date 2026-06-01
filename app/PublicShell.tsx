@@ -23,6 +23,31 @@ export default function PublicShell({
   useLayoutEffect(() => {
     if (isDashboard) return;
 
+    const root = document.documentElement;
+
+    const syncViewportWidth = () => {
+      root.style.setProperty("--app-viewport-width", `${window.innerWidth}px`);
+    };
+
+    syncViewportWidth();
+
+    window.addEventListener("resize", syncViewportWidth);
+    window.addEventListener("orientationchange", syncViewportWidth);
+    window.visualViewport?.addEventListener("resize", syncViewportWidth);
+
+    const frame = window.requestAnimationFrame(syncViewportWidth);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", syncViewportWidth);
+      window.removeEventListener("orientationchange", syncViewportWidth);
+      window.visualViewport?.removeEventListener("resize", syncViewportWidth);
+    };
+  }, [isDashboard, pathname]);
+
+  useLayoutEffect(() => {
+    if (isDashboard) return;
+
     const html = document.documentElement;
     const previousScrollBehavior = html.style.scrollBehavior;
 
@@ -49,7 +74,7 @@ export default function PublicShell({
   }
 
   return (
-    <main className="flex flex-col items-center bg-gray-50">
+    <main className="public-shell flex flex-col items-center bg-gray-50">
       {!isHome && <Header />}
       <AnimatePresence mode="wait" initial={false}>
         <motion.section
