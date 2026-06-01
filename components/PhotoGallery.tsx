@@ -56,6 +56,12 @@ function getWrappedImageIndex(index: number, imageCount: number) {
   return (index + imageCount) % imageCount;
 }
 
+function preloadImage(src: string) {
+  const image = new window.Image();
+  image.decoding = "async";
+  image.src = src;
+}
+
 export default function PhotoGallery({ projects }: PhotoGalleryProps) {
   const [activeProjectIndex, setActiveProjectIndex] = useState<number | null>(
     null,
@@ -244,6 +250,21 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
     };
   }, [activeImage, activeProject, closeLightbox, showNext, showPrevious]);
 
+  useEffect(() => {
+    if (activeImages.length < 2) return;
+
+    preloadImage(
+      activeImages[
+        getWrappedImageIndex(activeImageIndex + 1, activeImages.length)
+      ].src,
+    );
+    preloadImage(
+      activeImages[
+        getWrappedImageIndex(activeImageIndex - 1, activeImages.length)
+      ].src,
+    );
+  }, [activeImageIndex, activeImages]);
+
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     touchStartRef.current = event.touches[0].clientX;
   };
@@ -324,6 +345,7 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
                         sizes="(min-width: 1536px) 18vw, (min-width: 1280px) 23vw, (min-width: 768px) 31vw, 48vw"
                         className="object-cover transition duration-700 ease-out group-hover:scale-[1.055]"
                         loading="lazy"
+                        unoptimized
                       />
                     </span>
                     <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-white/10 opacity-75 transition duration-500 group-hover:opacity-90" />
@@ -368,6 +390,7 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
                 aria-hidden="true"
                 sizes="100vw"
                 className="scale-110 object-cover opacity-25 blur-2xl"
+                unoptimized
               />
               <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/90" />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12),transparent_48%)]" />
@@ -431,6 +454,7 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
                 priority
                 sizes="100vw"
                 className="object-contain drop-shadow-[0_30px_90px_rgba(0,0,0,0.62)]"
+                unoptimized
               />
             </motion.div>
 
@@ -461,6 +485,7 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
                         fill
                         sizes="33vw"
                         className="object-cover"
+                        unoptimized
                       />
                     </button>
                   );
@@ -494,6 +519,7 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
                         fill
                         sizes="96px"
                         className="object-cover"
+                        unoptimized
                       />
                     </button>
                   );
