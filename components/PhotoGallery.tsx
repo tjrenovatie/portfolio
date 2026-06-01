@@ -52,6 +52,10 @@ function getColumnCount(width: number) {
   return 2;
 }
 
+function getWrappedImageIndex(index: number, imageCount: number) {
+  return (index + imageCount) % imageCount;
+}
+
 export default function PhotoGallery({ projects }: PhotoGalleryProps) {
   const [activeProjectIndex, setActiveProjectIndex] = useState<number | null>(
     null,
@@ -72,8 +76,46 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
   );
   const activeProject =
     activeProjectIndex === null ? null : visibleProjects[activeProjectIndex];
-  const activeImages = activeProject?.images ?? [];
+  const activeImages = useMemo(
+    () => activeProject?.images ?? [],
+    [activeProject],
+  );
   const activeImage = activeImages[activeImageIndex] ?? null;
+  const mobilePreviewImages = useMemo(() => {
+    if (activeImages.length === 0) return [];
+
+    if (activeImages.length === 1) {
+      return [{ image: activeImages[0], imageIndex: 0, label: "Huidige foto" }];
+    }
+
+    return [
+      {
+        image: activeImages[
+          getWrappedImageIndex(activeImageIndex - 1, activeImages.length)
+        ],
+        imageIndex: getWrappedImageIndex(
+          activeImageIndex - 1,
+          activeImages.length,
+        ),
+        label: "Vorige foto",
+      },
+      {
+        image: activeImages[activeImageIndex],
+        imageIndex: activeImageIndex,
+        label: "Huidige foto",
+      },
+      {
+        image: activeImages[
+          getWrappedImageIndex(activeImageIndex + 1, activeImages.length)
+        ],
+        imageIndex: getWrappedImageIndex(
+          activeImageIndex + 1,
+          activeImages.length,
+        ),
+        label: "Volgende foto",
+      },
+    ];
+  }, [activeImageIndex, activeImages]);
 
   const columns = useMemo(() => {
     const nextColumns = Array.from({ length: layout.columnCount }, () => ({
@@ -374,7 +416,7 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
             <motion.div
               key={activeImage.id}
               animate={{ opacity: 1, scale: 1, x: 0 }}
-              className="relative h-[70vh] w-full max-w-7xl sm:h-[76vh] lg:h-[82vh]"
+              className="relative h-[58vh] w-full max-w-7xl sm:h-[76vh] lg:h-[82vh]"
               initial={{
                 opacity: 0,
                 scale: 0.985,
@@ -392,7 +434,41 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
               />
             </motion.div>
 
-            <div className="absolute bottom-5 left-1/2 z-20 w-[calc(100vw-2rem)] max-w-4xl -translate-x-1/2 rounded-2xl border border-white/10 bg-black/45 p-2 shadow-[0_18px_60px_rgba(0,0,0,0.35)] backdrop-blur-md">
+            <div className="absolute bottom-4 left-1/2 z-20 w-[calc(100vw-2rem)] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/50 p-2 shadow-[0_18px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:hidden">
+              <div className="grid grid-cols-3 gap-2">
+                {mobilePreviewImages.map(({ image, imageIndex, label }) => {
+                  const isActive = imageIndex === activeImageIndex;
+
+                  return (
+                    <button
+                      key={`${label}-${image.id}`}
+                      type="button"
+                      onClick={() => {
+                        setDirection(imageIndex > activeImageIndex ? 1 : -1);
+                        setActiveImageIndex(imageIndex);
+                      }}
+                      className={`relative h-16 overflow-hidden rounded-xl border transition ${
+                        isActive
+                          ? "border-white shadow-[0_0_0_2px_rgba(255,255,255,0.35)]"
+                          : "border-white/15 opacity-75"
+                      }`}
+                      aria-current={isActive ? "true" : undefined}
+                      aria-label={`${label} van ${activeProject.title}`}
+                    >
+                      <Image
+                        src={image.src}
+                        alt={image.alt}
+                        fill
+                        sizes="33vw"
+                        className="object-cover"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="absolute bottom-5 left-1/2 z-20 hidden w-[calc(100vw-2rem)] max-w-4xl -translate-x-1/2 rounded-2xl border border-white/10 bg-black/45 p-2 shadow-[0_18px_60px_rgba(0,0,0,0.35)] backdrop-blur-md sm:block">
               <div className="flex gap-2 overflow-x-auto p-1">
                 {activeImages.map((projectImage, projectImageIndex) => {
                   const isActive = projectImageIndex === activeImageIndex;

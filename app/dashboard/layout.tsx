@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
   Bars3Icon,
   ChartBarIcon,
   EnvelopeIcon,
   IdentificationIcon,
   FolderIcon,
   HomeIcon,
-  RectangleGroupIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
 import {
@@ -77,10 +78,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           }
           aria-expanded={!isSidebarCollapsed}
           onClick={() => setIsSidebarCollapsed((current) => !current)}
-          className="absolute right-0 top-20 z-10 h-9 w-9 translate-x-1/2 rounded-full !gap-0 !p-0 shadow-sm"
+          className="absolute right-0 top-20 z-10 h-9 !min-h-9 w-9 translate-x-1/2 rounded-full !gap-0 !p-0 shadow-sm"
           variant="secondary"
         >
-          <RectangleGroupIcon className="h-5 w-5" aria-hidden="true" />
+          {isSidebarCollapsed ? (
+            <ArrowRightIcon className="h-5 w-5" aria-hidden="true" />
+          ) : (
+            <ArrowLeftIcon className="h-5 w-5" aria-hidden="true" />
+          )}
         </DashboardButton>
 
         <div className="flex h-16 items-center justify-between border-b border-neutral-800 px-3">
