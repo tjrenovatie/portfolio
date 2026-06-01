@@ -6,11 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/button";
+import { useLandscapeHeaderSpacing } from "@/hooks/useLandscapeHeaderSpacing";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const { menuButtonStyle, navStyle } = useLandscapeHeaderSpacing();
 
   const navigation = [
     { name: "HOME", href: "/" },
@@ -31,7 +33,10 @@ export default function Header() {
     >
       {!isHome && <div className="absolute inset-0 bg-black/55" />}
 
-      <nav className="relative mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <nav
+        className="relative mx-auto flex h-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+        style={navStyle}
+      >
         {!isHome && (
           <div className="flex lg:flex-1">
             <Link href="/" className="flex items-center">
@@ -58,6 +63,7 @@ export default function Header() {
               aria-controls="mobile-navigation"
               onClick={() => setIsOpen(false)}
               className="fixed right-4 top-4 z-[70] !h-12 !w-12 rotate-90 !gap-0 !rounded-full border border-white/25 !bg-black/25 !p-0 !text-[var(--color-primary)] shadow-lg shadow-black/20 backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:!bg-black/35 hover:!text-[var(--color-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-6"
+              style={menuButtonStyle}
             >
               <span
                 aria-hidden="true"
@@ -80,6 +86,7 @@ export default function Header() {
               aria-expanded="false"
               onClick={() => setIsOpen(true)}
               className="relative !h-12 !w-12 !gap-0 !rounded-full border border-white/25 !bg-black/25 !p-0 !text-[var(--color-primary)] shadow-lg shadow-black/20 backdrop-blur-md transition-all duration-300 hover:border-white/40 hover:!bg-black/35 hover:!text-[var(--color-secondary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              style={menuButtonStyle}
             >
               <span
                 aria-hidden="true"

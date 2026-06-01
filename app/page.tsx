@@ -6,10 +6,12 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Icon from "../components/icon";
 import { Socials } from "../lib/data";
 import { AnimatePresence, motion } from "framer-motion";
+import { useLandscapeHeaderSpacing } from "@/hooks/useLandscapeHeaderSpacing";
 
 const Home = () => {
   const [hasAnimated, setHasAnimated] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { menuButtonStyle } = useLandscapeHeaderSpacing();
 
   const handleAnimationComplete = () => {
     setHasAnimated(true);
@@ -44,6 +46,7 @@ const Home = () => {
         aria-controls="home-mobile-navigation"
         onClick={() => setIsMenuOpen((current) => !current)}
         className="absolute right-4 top-4 z-30 flex h-12 w-12 items-center justify-center rounded-full border border-white/25 bg-black/25 text-[--color-primary] shadow-lg shadow-black/20 backdrop-blur-md transition hover:border-white/40 hover:bg-black/35 hover:text-[--color-secondary] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:right-6 lg:hidden"
+        style={menuButtonStyle}
       >
         {isMenuOpen ? (
           <XMarkIcon className="h-6 w-6" aria-hidden="true" />
