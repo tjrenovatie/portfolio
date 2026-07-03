@@ -13,7 +13,7 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.wordWrapColumn": 1,
   "editor.wordWrap": "on",
-  "workbench.sideBar.location": "right",
+  "workbench.sideBar.location": "left",
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#988100",
     "activityBar.background": "#988100",
