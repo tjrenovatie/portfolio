@@ -1,6 +1,7 @@
 name: Deploy Production
 
-# Pushes to main deploy to the Vercel production environment.
+# Pushes to main deploy to the Vercel production environment
+# and are aliased to tj-renovatie.nl.
 on:
   push:
     branches:
@@ -18,11 +19,15 @@ permissions:
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  PRODUCTION_ALIAS: tj-renovatie.nl
 
 jobs:
   deploy-production:
     name: Build & deploy (production)
     runs-on: ubuntu-latest
+    environment: production
+    env:
+      VERCEL_ENV: production
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -31,23 +36,54 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git author for Vercel
+        run: |
+          git config --global user.name "tjrenovatie"
+          git config --global user.email "info@tj-renovatie.nl"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
       - name: Pull Vercel environment information
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Validate database migration environment
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || vars.DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL || vars.POSTGRES_URL }}
+        run: |
+          if ! node -e "const raw = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); if (!raw) process.exit(1); const url = raw.replace(/^(DATABASE_URL|POSTGRES_URL)=/, '').replace(/^[\"']|[\"']$/g, '').trim(); try { const parsed = new URL(url); process.exit(['postgres:', 'postgresql:'].includes(parsed.protocol) ? 0 : 1); } catch { process.exit(1); }"; then
+            echo "DATABASE_URL or POSTGRES_URL is missing, empty, or not a valid Postgres URL in the GitHub production environment."
+            echo "Add DATABASE_URL or POSTGRES_URL to GitHub Settings > Environments > production as an environment secret or variable."
+            exit 1
+          fi
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || vars.DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL || vars.POSTGRES_URL }}
+        run: node scripts/migrate-db.mjs
 
       - name: Build project artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
 
       - name: Deploy to Vercel (production)
         id: deploy
         run: |
-          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }})
           echo "url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Assign production alias
+        run: |
+          vercel alias set "${{ steps.deploy.outputs.url }}" "$PRODUCTION_ALIAS" --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
           {
             echo "### 🚀 Production deployed"
             echo ""
-            echo "${url}"
+            echo "- Deployment: ${{ steps.deploy.outputs.url }}"
+            echo "- Alias: https://${PRODUCTION_ALIAS}"
           } >> "$GITHUB_STEP_SUMMARY"

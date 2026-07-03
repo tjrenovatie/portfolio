@@ -1,6 +1,7 @@
 name: Deploy Preview
 
-# Any branch except main deploys to a Vercel preview environment.
+# Any branch except main deploys to the Vercel preview environment
+# and is aliased to dev.tj-renovatie.nl.
 on:
   push:
     branches-ignore:
@@ -18,12 +19,15 @@ permissions:
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  PREVIEW_ALIAS: preview.shurmeen.com
+  PREVIEW_ALIAS: dev.tj-renovatie.nl
 
 jobs:
   deploy-preview:
     name: Build & deploy (preview)
     runs-on: ubuntu-latest
+    environment: preview
+    env:
+      VERCEL_ENV: preview
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -32,25 +36,51 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure Git author for Vercel
+        run: |
+          git config --global user.name "tjrenovatie"
+          git config --global user.email "info@tj-renovatie.nl"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
       - name: Pull Vercel environment information
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Validate database migration environment
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || vars.DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL || vars.POSTGRES_URL }}
+        run: |
+          if ! node -e "const raw = process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim(); if (!raw) process.exit(1); const url = raw.replace(/^(DATABASE_URL|POSTGRES_URL)=/, '').replace(/^[\"']|[\"']$/g, '').trim(); try { const parsed = new URL(url); process.exit(['postgres:', 'postgresql:'].includes(parsed.protocol) ? 0 : 1); } catch { process.exit(1); }"; then
+            echo "DATABASE_URL or POSTGRES_URL is missing, empty, or not a valid Postgres URL in the GitHub preview environment."
+            echo "Add DATABASE_URL or POSTGRES_URL to GitHub Settings > Environments > preview as an environment secret or variable."
+            exit 1
+          fi
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || vars.DATABASE_URL }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL || vars.POSTGRES_URL }}
+        run: node scripts/migrate-db.mjs
 
       - name: Build project artifacts
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --target=preview --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
 
       - name: Deploy to Vercel (preview)
         id: deploy
         run: |
-          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          url=$(vercel deploy --prebuilt --yes --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }})
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Assign preview alias
         run: |
-          vercel alias set "${{ steps.deploy.outputs.url }}" "$PREVIEW_ALIAS" --token=${{ secrets.VERCEL_TOKEN }}
+          vercel alias set "${{ steps.deploy.outputs.url }}" "$PREVIEW_ALIAS" --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
           {
             echo "### ✅ Preview deployed"
             echo ""
