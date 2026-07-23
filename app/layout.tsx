@@ -2,6 +2,7 @@ import "./globals.css";
 
 import React from "react";
 import type { Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { siteMetadata } from "./site-metadata";
 import PublicShell from "./PublicShell";
 import { getWebsiteDisplayEnabled } from "@/lib/site-settings";
@@ -24,6 +25,7 @@ export default async function RootLayout({
       <head>{siteMetadata}</head>
       <body className={`bg-black`}>
         <PublicShell isWebsiteEnabled={isWebsiteEnabled}>{children}</PublicShell>
+        <Analytics />
       </body>
     </html>
   );
