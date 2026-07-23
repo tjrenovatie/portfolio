@@ -23,6 +23,14 @@ html {
   --color-secondary: #b04a48;
   --color-primary-title: #665700;
 
+  /*================== Dark marble surfaces (Diensten, Over ons, ...) ==================*/
+  --color-background-dark: #111111;
+  --color-surface-anthracite: #1a1a1a;
+  --color-surface-card: #222222;
+  --color-broken-white: #f5f2ed;
+  --color-text-muted: #cfcfcf;
+  --color-border-subtle: rgba(255, 255, 255, 0.1);
+
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }

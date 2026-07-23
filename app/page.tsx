@@ -19,6 +19,7 @@ const Home = () => {
 
   let navigationLinks = [
     { name: "ABOUT", url: "/about" },
+    { name: "DIENSTEN", url: "/diensten" },
     { name: "PROJECTS", url: "/projects" },
     { name: "CONTACT", url: "/contact" },
   ];

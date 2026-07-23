@@ -33,6 +33,11 @@ export const Routes = [
     key: "about",
   },
   {
+    name: "Diensten",
+    url: "/diensten",
+    key: "diensten",
+  },
+  {
     name: "Projects",
     url: "/projects",
     key: "projects",

@@ -331,7 +331,7 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
                       setActiveImageIndex(0);
                       setActiveProjectIndex(index);
                     }}
-                    className="group relative block w-full overflow-hidden rounded-[1.25rem] border border-white/70 bg-neutral-200 text-left shadow-[0_18px_45px_rgba(28,25,23,0.12)] outline-none ring-1 ring-black/[0.03] transition duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(28,25,23,0.22)] focus-visible:ring-2 focus-visible:ring-[--color-primary] focus-visible:ring-offset-4 focus-visible:ring-offset-neutral-50"
+                    className="group relative block w-full overflow-hidden rounded-[1.25rem] bg-neutral-200 text-left shadow-[0_20px_50px_-16px_rgba(17,17,17,0.35)] outline-none ring-1 ring-black/[0.04] transition duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_32px_80px_-16px_rgba(17,17,17,0.45)] focus-visible:ring-2 focus-visible:ring-[--color-primary] focus-visible:ring-offset-4 focus-visible:ring-offset-neutral-50"
                     aria-label={`Open project ${project.title}`}
                   >
                     <span
@@ -348,14 +348,11 @@ export default function PhotoGallery({ projects }: PhotoGalleryProps) {
                         unoptimized
                       />
                     </span>
-                    <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-white/10 opacity-75 transition duration-500 group-hover:opacity-90" />
-                    <span className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/25 to-transparent opacity-60 transition duration-500 group-hover:opacity-80" />
-                    <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 p-2.5 sm:p-4">
-                      <div className="rounded-xl border border-white/20 bg-black/45 px-2.5 py-2 text-white shadow-[0_12px_32px_rgba(0,0,0,0.28)] backdrop-blur-md transition duration-500 group-hover:bg-black/55 sm:rounded-2xl sm:px-4 sm:py-2.5">
-                        <span className="block max-w-full break-words text-[clamp(0.72rem,2.8vw,0.95rem)] font-semibold leading-snug tracking-[0.01em] text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
-                          {project.title}
-                        </span>
-                      </div>
+                    <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-70 transition duration-500 group-hover:opacity-90" />
+                    <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 p-3 sm:p-5">
+                      <span className="block max-w-full break-words text-[clamp(0.7rem,2.6vw,0.85rem)] font-semibold uppercase leading-snug tracking-[0.08em] text-white drop-shadow-[0_1px_10px_rgba(0,0,0,0.85)]">
+                        {project.title}
+                      </span>
                     </figcaption>
                   </button>
                 </motion.figure>
