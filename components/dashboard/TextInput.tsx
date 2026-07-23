@@ -1,5 +1,5 @@
 import type { InputHTMLAttributes } from "react";
-import TextInput from "@/components/textInput";
+import TextInput from "@/components/text-input";
 
 type DashboardTextInputProps = InputHTMLAttributes<HTMLInputElement> & {
   error?: string;

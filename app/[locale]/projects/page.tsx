@@ -1,6 +1,6 @@
 import PhotoGallery, {
   type PhotoGalleryProject,
-} from "@/components/PhotoGallery";
+} from "@/components/photo-gallery";
 import { MotionDiv, MotionH1, MotionP } from "@/components/motion";
 import { getPublicProjects } from "@/lib/db-projects";
 import { projects as fallbackProjects } from "@/lib/projects";

@@ -12,7 +12,7 @@ import {
 } from "@/components/motion";
 import { getFirstBlobUrl } from "@/lib/vercel-blob";
 import { projects } from "@/lib/projects";
-import FaqAccordion from "./FaqAccordion";
+import FaqAccordion from "./faq-accordion";
 
 export async function generateMetadata({
   params,

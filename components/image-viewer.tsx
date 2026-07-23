@@ -1,4 +1,3 @@
-// components/ImageViewer.tsx
 "use client";
 
 import {

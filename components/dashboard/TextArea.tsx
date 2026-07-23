@@ -1,5 +1,5 @@
 import type { TextareaHTMLAttributes } from "react";
-import TextArea from "@/components/textArea";
+import TextArea from "@/components/text-area";
 
 type DashboardTextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   error?: string;

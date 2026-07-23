@@ -5,8 +5,8 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { motion, type Variants } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/button";
-import TextArea from "@/components/textArea";
-import TextInput from "@/components/textInput";
+import TextArea from "@/components/text-area";
+import TextInput from "@/components/text-input";
 
 interface FormData {
   name: string;

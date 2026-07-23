@@ -1,8 +1,7 @@
-// app/projects/ProjectsClientWrapper.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-import ImageViewer from "@/components/imageViewer";
+import ImageViewer from "@/components/image-viewer";
 import type { Project } from "@/lib/projects";
 
 export default function ProjectsClientWrapper({
