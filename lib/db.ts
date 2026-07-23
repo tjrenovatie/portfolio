@@ -21,31 +21,42 @@ function normalizeDatabaseUrl(rawDatabaseUrl: string) {
   return databaseUrl;
 }
 
-const rawDatabaseUrl =
-  process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
+function getDatabaseUrl(): string {
+  const rawDatabaseUrl =
+    process.env.DATABASE_URL?.trim() || process.env.POSTGRES_URL?.trim();
 
-const databaseUrl = rawDatabaseUrl ? normalizeDatabaseUrl(rawDatabaseUrl) : "";
+  if (!rawDatabaseUrl) {
+    throw new Error("DATABASE_URL or POSTGRES_URL must be set.");
+  }
 
-function throwMissingDatabaseUrl(): never {
-  throw new Error("DATABASE_URL or POSTGRES_URL must be set.");
+  return normalizeDatabaseUrl(rawDatabaseUrl);
 }
 
-function createMissingDatabaseClient() {
-  return new Proxy(() => throwMissingDatabaseUrl(), {
-    apply() {
-      return throwMissingDatabaseUrl();
-    },
-    get(_target, property) {
-      if (property === "query") {
-        return () => throwMissingDatabaseUrl();
-      }
+let cachedSql: ReturnType<typeof neon> | undefined;
 
-      return undefined;
-    },
-  }) as unknown as ReturnType<typeof neon>;
+function getSql(): ReturnType<typeof neon> {
+  if (!cachedSql) {
+    cachedSql = neon(getDatabaseUrl());
+  }
+
+  return cachedSql;
 }
 
-export const sql = databaseUrl ? neon(databaseUrl) : createMissingDatabaseClient();
+// Deferred so importing this module (e.g. during Next.js's build-time page
+// data collection) never needs a real DATABASE_URL/POSTGRES_URL — Vercel's
+// sensitive env vars are only decrypted at request runtime, not for `vercel
+// build` running outside Vercel's own build infrastructure.
+export const sql: ReturnType<typeof neon> = new Proxy(
+  (() => {}) as unknown as ReturnType<typeof neon>,
+  {
+    apply(_target, _thisArg, args) {
+      return Reflect.apply(getSql(), undefined, args);
+    },
+    get(_target, property, receiver) {
+      return Reflect.get(getSql(), property, receiver);
+    },
+  },
+);
 
 export type ProjectRecord = {
   id: string;
