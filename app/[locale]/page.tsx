@@ -1,10 +1,11 @@
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import Icon from "../components/icon";
-import { Socials } from "../lib/data";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
+import Icon from "@/components/icon";
+import { Socials } from "@/lib/data";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLandscapeHeaderSpacing } from "@/hooks/useLandscapeHeaderSpacing";
 
@@ -12,16 +13,17 @@ const Home = () => {
   const [hasAnimated, setHasAnimated] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { menuButtonStyle } = useLandscapeHeaderSpacing();
+  const t = useTranslations();
 
   const handleAnimationComplete = () => {
     setHasAnimated(true);
   };
 
   let navigationLinks = [
-    { name: "ABOUT", url: "/about" },
-    { name: "DIENSTEN", url: "/diensten" },
-    { name: "PROJECTS", url: "/projects" },
-    { name: "CONTACT", url: "/contact" },
+    { name: t("nav.about"), url: "/about" },
+    { name: t("nav.diensten"), url: "/diensten" },
+    { name: t("nav.projects"), url: "/projects" },
+    { name: t("nav.contact"), url: "/contact" },
   ];
 
   return (
@@ -115,9 +117,9 @@ const Home = () => {
         </div>
         <div className="landing-description flex justify-center">
           <h1 className="text-center text-xl font-light text-white sm:text-2xl">
-            Voor ontwerp, advies, verbouwing en renovatie.
+            {t("home.taglineLine1")}
             <br />
-            Komt goed!
+            {t("home.taglineLine2")}
           </h1>
         </div>
 
@@ -161,12 +163,12 @@ const Home = () => {
           </ul>
         ) : (
           <div className="flex flex-col items-center gap-4">
-            <p>No social links available.</p>
+            <p>{t("home.noSocials")}</p>
             <Link
               href="/contact"
               className="text-[--color-primary] underline hover:text-white"
             >
-              Contact us for more information
+              {t("home.contactCta")}
             </Link>
           </div>
         )}

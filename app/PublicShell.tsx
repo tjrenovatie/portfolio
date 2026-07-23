@@ -17,12 +17,9 @@ export default function PublicShell({
   isWebsiteEnabled,
 }: PublicShellProps) {
   const { isHome, pathname } = useCurrentPage();
-  const isDashboard = pathname.startsWith("/dashboard");
   const sectionSpacing = isHome ? "mt-0" : "mt-20";
 
   useLayoutEffect(() => {
-    if (isDashboard) return;
-
     const root = document.documentElement;
 
     const syncViewportWidth = () => {
@@ -43,11 +40,9 @@ export default function PublicShell({
       window.removeEventListener("orientationchange", syncViewportWidth);
       window.visualViewport?.removeEventListener("resize", syncViewportWidth);
     };
-  }, [isDashboard, pathname]);
+  }, [pathname]);
 
   useLayoutEffect(() => {
-    if (isDashboard) return;
-
     const html = document.documentElement;
     const previousScrollBehavior = html.style.scrollBehavior;
 
@@ -63,11 +58,7 @@ export default function PublicShell({
       window.cancelAnimationFrame(frame);
       html.style.scrollBehavior = previousScrollBehavior;
     };
-  }, [isDashboard, pathname]);
-
-  if (isDashboard) {
-    return children;
-  }
+  }, [pathname]);
 
   if (!isWebsiteEnabled) {
     return <main className="min-h-dvh bg-white" aria-hidden="true" />;

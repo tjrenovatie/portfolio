@@ -1,30 +1,23 @@
 import type { MetadataRoute } from "next";
+import { routing } from "@/i18n/routing";
+
+const routes = [
+  { path: "", changeFrequency: "yearly" as const, priority: 1 },
+  { path: "/about", changeFrequency: "monthly" as const, priority: 0.8 },
+  { path: "/diensten", changeFrequency: "monthly" as const, priority: 0.8 },
+  { path: "/projects", changeFrequency: "weekly" as const, priority: 0.5 },
+  { path: "/contact", changeFrequency: "monthly" as const, priority: 0.8 },
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: "https://tj-renovatie.nl/",
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 1,
-    },
-    {
-      url: "https://tj-renovatie.nl/about",
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: "https://tj-renovatie.nl/projects",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
-    {
-      url: "https://tj-renovatie.nl/contact",
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-  ];
+  const lastModified = new Date();
+
+  return routing.locales.flatMap((locale) =>
+    routes.map((route) => ({
+      url: `https://tj-renovatie.nl/${locale}${route.path}`,
+      lastModified,
+      changeFrequency: route.changeFrequency,
+      priority: route.priority,
+    })),
+  );
 }

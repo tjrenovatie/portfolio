@@ -3,6 +3,7 @@ import React, { useState, useCallback } from "react";
 import Image from "next/image";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import { motion, type Variants } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/button";
 import TextArea from "@/components/textArea";
 import TextInput from "@/components/textInput";
@@ -14,12 +15,6 @@ interface FormData {
 }
 
 const initialFormState: FormData = { name: "", email: "", message: "" };
-
-const contactPoints = [
-  "Persoonlijk advies voor uw ruimte",
-  "Duidelijke afspraken over planning",
-  "Reactie met een praktische volgende stap",
-];
 
 const containerVariants: Variants = {
   hidden: {},
@@ -60,16 +55,18 @@ const revealRight: Variants = {
  * @returns
  */
 export default function Contact() {
+  const t = useTranslations("contact");
+  const contactPoints = t.raw("expectPoints") as string[];
   const [formData, setFormData] = useState<FormData>(initialFormState);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const validateField = (name: keyof FormData, value: string): string => {
-    if (!value.trim()) return "Dit veld is verplicht.";
+    if (!value.trim()) return t("form.requiredError");
 
     if (name === "email" && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(value)) {
-      return "Vul een geldig e-mailadres in.";
+      return t("form.invalidEmailError");
     }
 
     return "";
@@ -123,12 +120,12 @@ export default function Contact() {
       if (res.ok) {
         setFormData(initialFormState);
         setErrors({});
-        setSuccessMessage("Uw bericht is verzonden. Ik neem contact met u op.");
+        setSuccessMessage(t("form.successMessage"));
       } else {
-        setSuccessMessage("Er ging iets mis. Probeer het later opnieuw.");
+        setSuccessMessage(t("form.errorMessage"));
       }
     } catch (error) {
-      setSuccessMessage("Er ging iets mis. Probeer het later opnieuw.");
+      setSuccessMessage(t("form.errorMessage"));
     } finally {
       setIsSubmitting(false);
     }
@@ -144,20 +141,19 @@ export default function Contact() {
           variants={containerVariants}
         >
           <motion.p className="eyebrow mb-4" variants={revealUp}>
-            Contact
+            {t("eyebrow")}
           </motion.p>
           <motion.h1
             className="mb-5 text-[--color-primary-title]"
             variants={revealUp}
           >
-            Met wat kan ik je helpen?
+            {t("title")}
           </motion.h1>
           <motion.p
             className="max-w-2xl text-base leading-8 text-neutral-700 sm:text-lg"
             variants={revealUp}
           >
-            Vertel kort wat u wilt aanpakken. Ik reageer persoonlijk en denk mee
-            over de ruimte, de planning en de beste volgende stap.
+            {t("subtitle")}
           </motion.p>
         </motion.div>
 
@@ -183,7 +179,7 @@ export default function Contact() {
               type="text"
               id="name"
               name="name"
-              label="Naam"
+              label={t("form.nameLabel")}
               value={formData.name}
               onChange={handleChange}
               autoComplete="name"
@@ -194,7 +190,7 @@ export default function Contact() {
               type="email"
               id="email"
               name="email"
-              label="E-mailadres"
+              label={t("form.emailLabel")}
               value={formData.email}
               onChange={handleChange}
               autoComplete="email"
@@ -204,12 +200,12 @@ export default function Contact() {
             <TextArea
               id="message"
               name="message"
-              label="Bericht"
+              label={t("form.messageLabel")}
               rows={6}
               value={formData.message}
               onChange={handleChange}
               error={errors.message}
-              helperText="Bijvoorbeeld: type ruimte, gewenste werkzaamheden en gewenste periode."
+              helperText={t("form.messageHelperText")}
             />
 
             <Button
@@ -221,7 +217,7 @@ export default function Contact() {
               variant="dark"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Versturen..." : "Verstuur bericht"}
+              {isSubmitting ? t("form.submitting") : t("form.submitButton")}
             </Button>
           </motion.form>
 
@@ -240,7 +236,7 @@ export default function Contact() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10" />
             <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10">
               <p className="eyebrow eyebrow-light mb-4">
-                Wat u kunt verwachten
+                {t("expectEyebrow")}
               </p>
               <div className="grid gap-3">
                 {contactPoints.map((point) => (

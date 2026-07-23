@@ -3,47 +3,17 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import { useTranslations } from "next-intl";
 
 type FaqItem = {
   question: string;
   answer: string;
 };
 
-const faqItems: FaqItem[] = [
-  {
-    question: "Hoe lang duurt een gemiddelde badkamerrenovatie?",
-    answer:
-      "Een complete badkamerrenovatie duurt gemiddeld 2 tot 3 weken, afhankelijk van de complexiteit en de gekozen materialen.",
-  },
-  {
-    question: "Kan ik tijdens de renovatie in mijn woning blijven wonen?",
-    answer:
-      "Ja, dat kan meestal wel. We zorgen ervoor dat de overlast tot een minimum wordt beperkt en houden de werkplek elke dag schoon.",
-  },
-  {
-    question: "Zorgen jullie ook voor de afvoer van bouwafval?",
-    answer:
-      "Absoluut. Wij regelen de containers en de volledige afvoer van puin en oud sanitair, zodat u nergens omkijken naar heeft.",
-  },
-  {
-    question: "Moet ik zelf materialen inkopen?",
-    answer:
-      "Dat mag, maar het hoeft niet. Wij hebben goede contacten met leveranciers en kunnen alles voor u regelen tegen gunstige tarieven.",
-  },
-  {
-    question: "Werken jullie met vaste prijzen?",
-    answer:
-      "Wij werken op basis van een gespecificeerde offerte. Zo weet u vooraf exact waar u aan toe bent en zijn er geen verrassingen achteraf.",
-  },
-  {
-    question: "Zit er garantie op de uitgevoerde werkzaamheden?",
-    answer:
-      "Ja, wij bieden standaard garantie op al ons vakmanschap. De specifieke termijnen hangen af van het type werk en de gebruikte materialen.",
-  },
-];
-
 export default function FaqAccordion() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const t = useTranslations("diensten");
+  const faqItems = t.raw("faq") as FaqItem[];
 
   return (
     <div className="space-y-4">

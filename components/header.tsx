@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { Button } from "@/components/button";
 import { useLandscapeHeaderSpacing } from "@/hooks/useLandscapeHeaderSpacing";
 
@@ -13,13 +13,14 @@ export default function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const { menuButtonStyle, navStyle } = useLandscapeHeaderSpacing();
+  const t = useTranslations("nav");
 
   const navigation = [
-    { name: "HOME", href: "/" },
-    { name: "ABOUT", href: "/about" },
-    { name: "DIENSTEN", href: "/diensten" },
-    { name: "PROJECTS", href: "/projects" },
-    { name: "CONTACT", href: "/contact" },
+    { name: t("home"), href: "/" },
+    { name: t("about"), href: "/about" },
+    { name: t("diensten"), href: "/diensten" },
+    { name: t("projects"), href: "/projects" },
+    { name: t("contact"), href: "/contact" },
   ];
 
   const close = () => {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { Variants } from "framer-motion";
 import Image from "next/image";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ButtonLink } from "@/components/button";
 import {
   MotionDiv,
@@ -13,11 +14,19 @@ import { getFirstBlobUrl } from "@/lib/vercel-blob";
 import { projects } from "@/lib/projects";
 import FaqAccordion from "./FaqAccordion";
 
-export const metadata: Metadata = {
-  title: "Diensten - TJ Renovatie | Vakmanschap in elk detail",
-  description:
-    "Badkamerrenovatie, keukenrenovatie, tegelwerk, cinewalls en complete woningrenovaties. Vraag een vrijblijvende offerte aan bij TJ Renovatie.",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "diensten" });
+
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
 const containerVariants: Variants = {
   hidden: {},
@@ -37,49 +46,8 @@ const revealUp: Variants = {
   },
 };
 
-const cardCategories = [
-  {
-    icon: "bx-layer",
-    title: "Tegelwerk",
-    description:
-      "Specialist in grootformaat tegels en complexe patronen. Perfecte voegen en naadloze overgangen.",
-  },
-  {
-    icon: "bx-tv",
-    title: "Wanden en cinewalls",
-    description:
-      "Moderne cinewalls met geïntegreerde haard en sfeerverlichting. Strak gestucte wanden voor een moderne look.",
-  },
-  {
-    icon: "bx-home-alt",
-    title: "Totaalrenovatie",
-    description:
-      "Wij nemen de gehele woning onder handen. Eén planning, één vast team en één verbluffend eindresultaat.",
-  },
-];
-
-const benefits = [
-  {
-    icon: "bx-user",
-    title: "Vast aanspreekpunt",
-    description: "Directe communicatie en korte lijnen gedurende het gehele traject.",
-  },
-  {
-    icon: "bx-calendar",
-    title: "Nauwkeurige planning",
-    description: "Duidelijke afspraken over deadlines en oplevermomenten.",
-  },
-  {
-    icon: "bxs-diamond",
-    title: "Premium materialen",
-    description: "Wij werken uitsluitend met producten van de hoogste kwaliteit.",
-  },
-  {
-    icon: "bx-badge-check",
-    title: "Garantie op werk",
-    description: "Zekerheid op de afwerking en de constructieve integriteit.",
-  },
-];
+const cardIcons = ["bx-layer", "bx-tv", "bx-home-alt"];
+const benefitIcons = ["bx-user", "bx-calendar", "bxs-diamond", "bx-badge-check"];
 
 async function getServiceImages() {
   const bathroomProject = projects.find((project) => project.id === "p1");
@@ -94,7 +62,21 @@ async function getServiceImages() {
 }
 
 export default async function DienstenPage() {
-  const { bathroomImage, kitchenImage } = await getServiceImages();
+  const [{ bathroomImage, kitchenImage }, t, locale] = await Promise.all([
+    getServiceImages(),
+    getTranslations("diensten"),
+    getLocale(),
+  ]);
+
+  const bathroomList = t.raw("bathroom.list") as string[];
+  const kitchenList = t.raw("kitchen.list") as string[];
+  const cardCategories = (
+    t.raw("cardCategories") as { title: string; description: string }[]
+  ).map((card, index) => ({ ...card, icon: cardIcons[index] }));
+  const benefits = (
+    t.raw("benefits") as { title: string; description: string }[]
+  ).map((benefit, index) => ({ ...benefit, icon: benefitIcons[index] }));
+  const contactHref = `/${locale}/contact`;
 
   return (
     <article className="w-full bg-[--color-background-dark] text-[--color-text-muted]">
@@ -111,26 +93,23 @@ export default async function DienstenPage() {
             className="eyebrow mb-4 !text-[--color-primary]"
             variants={revealUp}
           >
-            Onze diensten
+            {t("heroEyebrow")}
           </MotionP>
           <MotionH1
             className="mb-6 leading-tight text-[--color-broken-white]"
             variants={revealUp}
           >
-            Van idee tot perfecte afwerking
+            {t("heroTitle")}
           </MotionH1>
           <MotionP
             className="mb-10 max-w-2xl text-base leading-8 sm:text-lg"
             variants={revealUp}
           >
-            Bij TJ Renovatie combineren we jarenlange ervaring met precisie in
-            de uitvoering. Of het nu gaat om een specifieke ruimte of een
-            volledige transformatie van uw woning, wij leveren vakmanschap dat
-            voldoet aan de hoogste standaarden.
+            {t("heroBody")}
           </MotionP>
           <MotionDiv variants={revealUp}>
-            <ButtonLink href="/contact" variant="primary">
-              Vraag een vrijblijvende offerte aan
+            <ButtonLink href={contactHref} variant="primary">
+              {t("heroCta")}
             </ButtonLink>
           </MotionDiv>
         </div>
@@ -152,7 +131,7 @@ export default async function DienstenPage() {
           >
             <Image
               src={bathroomImage}
-              alt="Luxe badkamerrenovatie met donker tegelwerk"
+              alt={t("bathroom.imageAlt")}
               fill
               sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover"
@@ -161,19 +140,11 @@ export default async function DienstenPage() {
           </MotionDiv>
           <MotionDiv className="order-1 md:order-2" variants={revealUp}>
             <h2 className="mb-6 text-[--color-broken-white]">
-              Badkamerrenovatie
+              {t("bathroom.title")}
             </h2>
-            <p className="mb-8 text-base leading-8">
-              Wij transformeren uw badkamer tot een persoonlijke spa. Van het
-              verleggen van leidingen tot de laatste kitrand, wij ontzorgen u
-              volledig.
-            </p>
+            <p className="mb-8 text-base leading-8">{t("bathroom.body")}</p>
             <ul className="mb-10 space-y-3">
-              {[
-                "Installatie van sanitair en kranen",
-                "Waterdichte wand- en vloerafwerking",
-                "Maatwerk meubels en verlichtingsplan",
-              ].map((item) => (
+              {bathroomList.map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 bg-[--color-primary]" />
                   <span className="text-[--color-broken-white]">{item}</span>
@@ -181,11 +152,11 @@ export default async function DienstenPage() {
               ))}
             </ul>
             <ButtonLink
-              href="/contact"
+              href={contactHref}
               variant="primary"
               className="!bg-transparent border border-[--color-primary] !text-[--color-broken-white] hover:!bg-[--color-primary] hover:!text-white"
             >
-              Bespreek uw project
+              {t("bathroom.cta")}
             </ButtonLink>
           </MotionDiv>
         </MotionDiv>
@@ -200,19 +171,11 @@ export default async function DienstenPage() {
         >
           <MotionDiv variants={revealUp}>
             <h2 className="mb-6 text-[--color-broken-white]">
-              Keukenrenovatie
+              {t("kitchen.title")}
             </h2>
-            <p className="mb-8 text-base leading-8">
-              De keuken is het hart van de woning. Wij realiseren keukens die
-              niet alleen functioneel zijn, maar ook een architectonisch
-              statement vormen.
-            </p>
+            <p className="mb-8 text-base leading-8">{t("kitchen.body")}</p>
             <ul className="mb-10 space-y-3">
-              {[
-                "Aanpassen van elektra en gas/water",
-                "Vakkundige montage van apparatuur",
-                "Hoogwaardig tegelwerk en achterwanden",
-              ].map((item) => (
+              {kitchenList.map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 bg-[--color-primary]" />
                   <span className="text-[--color-broken-white]">{item}</span>
@@ -220,11 +183,11 @@ export default async function DienstenPage() {
               ))}
             </ul>
             <ButtonLink
-              href="/contact"
+              href={contactHref}
               variant="primary"
               className="!bg-transparent border border-[--color-primary] !text-[--color-broken-white] hover:!bg-[--color-primary] hover:!text-white"
             >
-              Bespreek uw project
+              {t("kitchen.cta")}
             </ButtonLink>
           </MotionDiv>
           <MotionDiv
@@ -233,7 +196,7 @@ export default async function DienstenPage() {
           >
             <Image
               src={kitchenImage}
-              alt="Moderne keukenrenovatie met maatwerk"
+              alt={t("kitchen.imageAlt")}
               fill
               sizes="(min-width: 768px) 50vw, 100vw"
               className="object-cover"
@@ -265,10 +228,10 @@ export default async function DienstenPage() {
               </h3>
               <p className="mb-6 flex-grow text-sm">{card.description}</p>
               <a
-                href="/contact"
+                href={contactHref}
                 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-[--color-primary]"
               >
-                Project bespreken
+                {t("cardCta")}
                 <i className="bx bx-right-arrow-alt" aria-hidden="true" />
               </a>
             </MotionDiv>
@@ -289,13 +252,13 @@ export default async function DienstenPage() {
             className="eyebrow mb-4 !text-[--color-primary-title]"
             variants={revealUp}
           >
-            Onze belofte
+            {t("promiseEyebrow")}
           </MotionP>
           <MotionH2
             className="text-2xl font-semibold text-[--color-broken-white] sm:text-3xl"
             variants={revealUp}
           >
-            Waarom kiezen voor TJ Renovatie
+            {t("promiseTitle")}
           </MotionH2>
         </MotionDiv>
         <MotionDiv
@@ -336,21 +299,18 @@ export default async function DienstenPage() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            Veelgestelde vragen
+            {t("faqTitle")}
           </MotionH2>
 
           <FaqAccordion />
 
           <div className="mt-16 border border-[--color-border-subtle] bg-[--color-surface-card] p-10 text-center">
             <h3 className="mb-4 text-xl font-semibold text-[--color-broken-white]">
-              Staat uw vraag er niet tussen?
+              {t("faqCtaTitle")}
             </h3>
-            <p className="mb-8">
-              Wij staan klaar om al uw specifieke vragen te beantwoorden over
-              uw aanstaande renovatie.
-            </p>
-            <ButtonLink href="/contact" variant="primary">
-              Neem contact op
+            <p className="mb-8">{t("faqCtaBody")}</p>
+            <ButtonLink href={contactHref} variant="primary">
+              {t("faqCtaButton")}
             </ButtonLink>
           </div>
         </div>

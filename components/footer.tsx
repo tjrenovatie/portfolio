@@ -1,10 +1,13 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Routes, Socials } from "../lib/data";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import Icon from "./icon";
 
 export default function Footer() {
+  const t = useTranslations();
+
   return (
     <footer className="w-full relative bg-marble-dark bg-no-repeat bg-cover text-white py-20">
       <div className="absolute inset-0 bg-black bg-opacity-50 z-0 pointer-events-none" />
@@ -28,19 +31,21 @@ export default function Footer() {
           aria-label="Footer Navigation"
         >
           <ul className="flex gap-6">
-            {Routes.filter(
-              (link) => link.name.toLocaleLowerCase() !== "home"
-            ).map((page) => (
-              <li key={page.key}>
-                <Link
-                  href={page.url}
-                  className="text-[--color-primary] font-semibold uppercase"
-                  aria-label={page.name}
-                >
-                  {page.name.toUpperCase()}
-                </Link>
-              </li>
-            ))}
+            {Routes.filter((link) => link.key !== "home").map((page) => {
+              const label = t(`nav.${page.key}`);
+
+              return (
+                <li key={page.key}>
+                  <Link
+                    href={page.url}
+                    className="text-[--color-primary] font-semibold uppercase"
+                    aria-label={label}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -68,7 +73,7 @@ export default function Footer() {
 
         {/* Copyright Section */}
         <div className="text-center pt-10 align-bottom">
-          <p>2024 all rights reserved tj-renovatie.nl</p>
+          <p>{t("footer.copyright")}</p>
         </div>
       </div>
     </footer>

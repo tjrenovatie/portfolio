@@ -6,6 +6,7 @@ import { getPublicProjects } from "@/lib/db-projects";
 import { projects as fallbackProjects } from "@/lib/projects";
 import { getFirstBlobUrl } from "@/lib/vercel-blob";
 import type { Variants } from "framer-motion";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -79,7 +80,10 @@ async function getGalleryProjects() {
 }
 
 export default async function ProjectsPage() {
-  const galleryProjects = await getGalleryProjects();
+  const [galleryProjects, t] = await Promise.all([
+    getGalleryProjects(),
+    getTranslations("projects"),
+  ]);
 
   return (
     <article className="min-h-screen w-full bg-[#f7f5f1] text-[--color-primary-title]">
@@ -91,20 +95,19 @@ export default async function ProjectsPage() {
           variants={containerVariants}
         >
           <MotionP className="eyebrow mb-4" variants={revealUp}>
-            Portfolio
+            {t("eyebrow")}
           </MotionP>
           <MotionH1
             className="mb-5 text-[--color-primary-title]"
             variants={revealUp}
           >
-            Onze Projecten
+            {t("title")}
           </MotionH1>
           <MotionP
             className="max-w-2xl text-base leading-8 text-neutral-700 sm:text-lg"
             variants={revealUp}
           >
-            Een selectie van afgeronde renovaties, badkamers, keukens en
-            interieurs.
+            {t("subtitle")}
           </MotionP>
         </MotionDiv>
 

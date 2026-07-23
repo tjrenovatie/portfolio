@@ -1,4 +1,4 @@
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/i18n/navigation";
 
 export function useCurrentPage() {
   const pathname = usePathname();
@@ -8,6 +8,7 @@ export function useCurrentPage() {
     pathname: currentPathname,
     isHome: currentPathname === "/",
     isAbout: currentPathname === "/about",
+    isDiensten: currentPathname === "/diensten",
     isProjects: currentPathname === "/projects",
     isContact: currentPathname === "/contact",
   };

@@ -1,10 +1,14 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
 import {
   DASHBOARD_HOME_PATH,
   DASHBOARD_LOGIN_PATH,
 } from "@/lib/dashboard-auth-routes";
 import { DASHBOARD_ROBOTS_HEADER } from "@/lib/dashboard-seo";
+
+const intlProxy = createIntlMiddleware(routing);
 
 function isAllowedDashboardEmail(email?: string | null) {
   const allowedEmail = process.env.ALLOWED_GOOGLE_EMAIL?.trim().toLowerCase();
@@ -18,7 +22,7 @@ function withDashboardRobotsHeader(response: NextResponse) {
   return response;
 }
 
-export async function proxy(request: NextRequest) {
+async function dashboardProxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const isLoginRoute = pathname === DASHBOARD_LOGIN_PATH;
   const token = await getToken({
@@ -43,6 +47,17 @@ export async function proxy(request: NextRequest) {
   return withDashboardRobotsHeader(NextResponse.next());
 }
 
+export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+    return dashboardProxy(request);
+  }
+
+  return intlProxy(request);
+}
+
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/((?!api|_next|_vercel|assets|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)",
+  ],
 };

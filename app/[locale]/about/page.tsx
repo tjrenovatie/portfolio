@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Variants } from "framer-motion";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ButtonLink } from "@/components/button";
 import {
   MotionDiv,
@@ -8,12 +9,6 @@ import {
   MotionSection,
 } from "@/components/motion";
 import { getProfileImage } from "@/lib/site-images";
-
-const contactHighlights = [
-  "Vrijblijvend meedenken",
-  "Heldere planning",
-  "Persoonlijke opvolging",
-];
 
 const containerVariants: Variants = {
   hidden: {},
@@ -63,7 +58,12 @@ const contactSectionVariants: Variants = {
 };
 
 const About = async () => {
-  const profileImage = await getProfileImage();
+  const [profileImage, t, locale] = await Promise.all([
+    getProfileImage(),
+    getTranslations("about"),
+    getLocale(),
+  ]);
+  const highlights = t.raw("highlights") as string[];
 
   return (
     <article className="bg-white text-neutral-900">
@@ -79,34 +79,30 @@ const About = async () => {
           variants={containerVariants}
         >
           <MotionP className="eyebrow mb-4" variants={revealUp}>
-            TJ Renovatie
+            {t("eyebrow")}
           </MotionP>
           <MotionH1
             className="mb-6 leading-tight tracking-normal text-[--color-primary-title]"
             variants={revealUp}
           >
-            Renovatie met aandacht voor planning, uitvoering en afwerking.
+            {t("title")}
           </MotionH1>
           <MotionP
             className="mb-5 text-base leading-8 text-neutral-700 sm:text-lg"
             variants={revealUp}
           >
-            Mijn naam is Thurston Joseph. Met TJ Renovatie help ik klanten met
-            duidelijke keuzes, praktisch advies en zorgvuldig uitgevoerde
-            verbouwingen in en rond de woning.
+            {t("intro1")}
           </MotionP>
           <MotionP
             className="mb-8 text-base leading-8 text-neutral-700 sm:text-lg"
             variants={revealUp}
           >
-            Of het nu gaat om een badkamer, keuken, toilet, woonkamer of een
-            complete binnenruimte: het doel is altijd hetzelfde. Heldere
-            afspraken, vakmanschap en een resultaat dat netjes wordt opgeleverd.
+            {t("intro2")}
           </MotionP>
 
           <MotionDiv className="flex" variants={revealUp}>
-            <ButtonLink href="/projects" variant="secondary">
-              Bekijk projecten
+            <ButtonLink href={`/${locale}/projects`} variant="secondary">
+              {t("viewProjectsCta")}
             </ButtonLink>
           </MotionDiv>
         </MotionDiv>
@@ -120,17 +116,16 @@ const About = async () => {
           >
             <Image
               src={profileImage.blobUrl}
-              alt={profileImage.altText ?? "Thurston Joseph"}
+              alt={profileImage.altText ?? t("profileName")}
               fill
               className="profile-image"
               priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-7">
-              <p className="eyebrow eyebrow-light">Thurston Joseph</p>
+              <p className="eyebrow eyebrow-light">{t("profileName")}</p>
               <p className="mt-2 max-w-md text-base leading-7 text-white">
-                Persoonlijk contact, duidelijke communicatie en aandacht voor het
-                werk op locatie.
+                {t("profileCaption")}
               </p>
             </div>
           </MotionDiv>
@@ -149,25 +144,24 @@ const About = async () => {
           variants={revealUp}
         >
           <div className="p-6 sm:p-8 lg:p-10">
-            <p className="eyebrow mb-4">Contact</p>
+            <p className="eyebrow mb-4">{t("contactEyebrow")}</p>
             <h2 className="mb-5 max-w-2xl text-3xl font-semibold text-[--color-primary-title] sm:text-4xl">
-              Heeft u plannen voor een verbouwing?
+              {t("contactTitle")}
             </h2>
             <p className="max-w-2xl text-base leading-8 text-neutral-700">
-              Vertel kort wat u wilt aanpakken. Dan kijken we samen naar de
-              ruimte, de planning en de beste volgende stap voor uw project.
+              {t("contactBody")}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/contact" variant="primary">
-                Start uw aanvraag
+              <ButtonLink href={`/${locale}/contact`} variant="primary">
+                {t("startRequestCta")}
               </ButtonLink>
             </div>
           </div>
 
           <div className="border-t border-neutral-200 bg-neutral-100 p-6 sm:p-8 md:border-l md:border-t-0 lg:p-10">
             <div className="grid gap-4">
-              {contactHighlights.map((highlight) => (
+              {highlights.map((highlight) => (
                 <div
                   key={highlight}
                   className="flex items-center gap-3 rounded-md border border-neutral-200 bg-white p-4"
@@ -181,10 +175,9 @@ const About = async () => {
             </div>
 
             <div className="mt-8 border-t border-neutral-200 pt-6">
-              <p className="eyebrow eyebrow-muted">Reactie</p>
+              <p className="eyebrow eyebrow-muted">{t("replyEyebrow")}</p>
               <p className="mt-2 text-base leading-7 text-neutral-700">
-                U ontvangt een persoonlijke reactie met vragen of een voorstel
-                voor een vervolggesprek.
+                {t("replyBody")}
               </p>
             </div>
           </div>

@@ -4,8 +4,6 @@ import React from "react";
 import type { Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { siteMetadata } from "./site-metadata";
-import PublicShell from "./PublicShell";
-import { getWebsiteDisplayEnabled } from "@/lib/site-settings";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -18,13 +16,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isWebsiteEnabled = await getWebsiteDisplayEnabled();
-
   return (
-    <html lang="en" className="!scroll-smooth">
+    <html lang="nl" className="!scroll-smooth">
       <head>{siteMetadata}</head>
       <body className={`bg-black`}>
-        <PublicShell isWebsiteEnabled={isWebsiteEnabled}>{children}</PublicShell>
+        {children}
         <Analytics />
       </body>
     </html>

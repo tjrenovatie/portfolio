@@ -1,0 +1,162 @@
+{
+  "metadata": {
+    "title": "TJ Renovatie - Leaders in Renovation Solutions",
+    "description": "Discover our projects, including modern living rooms, kitchen renovations and outdoor patios, all carried out with craftsmanship and sustainability in mind.",
+    "keywords": "renovation, tj renovatie, tj, construction, contractor, contractor tj renovatie, tj renovatie contractor, thurston joseph, thurston joseph renovation, thurston joseph construction, bathroom renovation, bathroom renovation tj, interior renovation, construction and renovation, remodeling, remodeling tj renovatie, sustainable building, sustainable building tj renovatie, renovations, renovations tj renovatie, interior renovation tj renovatie, bathroom renovation tj renovatie, garden renovation, garden renovation tj renovatie, garden projects"
+  },
+  "nav": {
+    "home": "HOME",
+    "about": "ABOUT",
+    "diensten": "SERVICES",
+    "projects": "PROJECTS",
+    "contact": "CONTACT"
+  },
+  "footer": {
+    "copyright": "2024 all rights reserved tj-renovatie.nl"
+  },
+  "home": {
+    "taglineLine1": "For design, advice, remodeling and renovation.",
+    "taglineLine2": "It'll turn out great!",
+    "noSocials": "No social links available.",
+    "contactCta": "Contact us for more information"
+  },
+  "about": {
+    "eyebrow": "TJ Renovatie",
+    "title": "Renovation with attention to planning, execution and finishing.",
+    "intro1": "My name is Thurston Joseph. With TJ Renovatie I help clients with clear choices, practical advice and carefully executed renovations in and around the home.",
+    "intro2": "Whether it's a bathroom, kitchen, toilet, living room or a complete interior space: the goal is always the same. Clear agreements, craftsmanship and a result that's delivered to a high standard.",
+    "viewProjectsCta": "View projects",
+    "profileName": "Thurston Joseph",
+    "profileCaption": "Personal contact, clear communication and attention to the work on site.",
+    "contactEyebrow": "Contact",
+    "contactTitle": "Do you have plans for a renovation?",
+    "contactBody": "Tell us briefly what you'd like to tackle. Then we'll look together at the space, the planning and the best next step for your project.",
+    "startRequestCta": "Start your request",
+    "highlights": ["Free, no-obligation thinking along", "Clear planning", "Personal follow-up"],
+    "replyEyebrow": "Reply",
+    "replyBody": "You'll receive a personal reply with questions or a proposal for a follow-up conversation."
+  },
+  "diensten": {
+    "metaTitle": "Services - TJ Renovatie | Craftsmanship in every detail",
+    "metaDescription": "Bathroom renovation, kitchen renovation, tiling, cinewalls and complete home renovations. Request a no-obligation quote from TJ Renovatie.",
+    "heroEyebrow": "Our services",
+    "heroTitle": "From idea to perfect finish",
+    "heroBody": "At TJ Renovatie we combine years of experience with precision in execution. Whether it's a specific space or a complete transformation of your home, we deliver craftsmanship that meets the highest standards.",
+    "heroCta": "Request a no-obligation quote",
+    "bathroom": {
+      "title": "Bathroom renovation",
+      "body": "We transform your bathroom into a personal spa. From rerouting pipes to the final bead of caulk, we take full care of everything.",
+      "imageAlt": "Luxury bathroom renovation with dark tiling",
+      "list": [
+        "Installation of sanitary ware and taps",
+        "Waterproof wall and floor finishing",
+        "Custom furniture and lighting plan"
+      ],
+      "cta": "Discuss your project"
+    },
+    "kitchen": {
+      "title": "Kitchen renovation",
+      "body": "The kitchen is the heart of the home. We create kitchens that are not only functional, but also make an architectural statement.",
+      "imageAlt": "Modern kitchen renovation with custom cabinetry",
+      "list": [
+        "Adjusting electrical and gas/water connections",
+        "Expert installation of appliances",
+        "High-quality tiling and splashbacks"
+      ],
+      "cta": "Discuss your project"
+    },
+    "cardCategories": [
+      {
+        "title": "Tiling",
+        "description": "Specialist in large-format tiles and complex patterns. Perfect grouting and seamless transitions."
+      },
+      {
+        "title": "Walls and cinewalls",
+        "description": "Modern cinewalls with integrated fireplace and ambient lighting. Sleek plastered walls for a modern look."
+      },
+      {
+        "title": "Full renovation",
+        "description": "We take on the entire home. One schedule, one dedicated team and one stunning end result."
+      }
+    ],
+    "cardCta": "Discuss project",
+    "promiseEyebrow": "Our promise",
+    "promiseTitle": "Why choose TJ Renovatie",
+    "benefits": [
+      {
+        "title": "Single point of contact",
+        "description": "Direct communication and short lines throughout the entire process."
+      },
+      {
+        "title": "Precise planning",
+        "description": "Clear agreements on deadlines and delivery moments."
+      },
+      {
+        "title": "Premium materials",
+        "description": "We work exclusively with products of the highest quality."
+      },
+      {
+        "title": "Warranty on work",
+        "description": "Assurance on the finish and the structural integrity."
+      }
+    ],
+    "faqTitle": "Frequently asked questions",
+    "faq": [
+      {
+        "question": "How long does an average bathroom renovation take?",
+        "answer": "A complete bathroom renovation takes an average of 2 to 3 weeks, depending on the complexity and the materials chosen."
+      },
+      {
+        "question": "Can I stay in my home during the renovation?",
+        "answer": "Yes, that's usually possible. We make sure disruption is kept to a minimum and keep the work area clean every day."
+      },
+      {
+        "question": "Do you also take care of construction waste removal?",
+        "answer": "Absolutely. We arrange the containers and the complete removal of rubble and old sanitary ware, so you don't have to worry about a thing."
+      },
+      {
+        "question": "Do I need to buy materials myself?",
+        "answer": "You can, but you don't have to. We have good contacts with suppliers and can arrange everything for you at favorable rates."
+      },
+      {
+        "question": "Do you work with fixed prices?",
+        "answer": "We work based on a detailed quote. That way you know exactly where you stand in advance, with no surprises afterwards."
+      },
+      {
+        "question": "Is there a warranty on the work carried out?",
+        "answer": "Yes, we offer a standard warranty on all our craftsmanship. The specific terms depend on the type of work and the materials used."
+      }
+    ],
+    "faqCtaTitle": "Don't see your question here?",
+    "faqCtaBody": "We're ready to answer any specific questions you have about your upcoming renovation.",
+    "faqCtaButton": "Get in touch"
+  },
+  "projects": {
+    "eyebrow": "Portfolio",
+    "title": "Our Projects",
+    "subtitle": "A selection of completed renovations, bathrooms, kitchens and interiors."
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "How can I help you?",
+    "subtitle": "Tell us briefly what you'd like to tackle. I'll respond personally and think along about the space, the planning and the best next step.",
+    "form": {
+      "nameLabel": "Name",
+      "emailLabel": "Email address",
+      "messageLabel": "Message",
+      "messageHelperText": "For example: type of space, desired work and desired timeframe.",
+      "requiredError": "This field is required.",
+      "invalidEmailError": "Please enter a valid email address.",
+      "submitting": "Sending...",
+      "submitButton": "Send message",
+      "successMessage": "Your message has been sent. I'll get in touch with you.",
+      "errorMessage": "Something went wrong. Please try again later."
+    },
+    "expectEyebrow": "What you can expect",
+    "expectPoints": [
+      "Personal advice for your space",
+      "Clear agreements on planning",
+      "A reply with a practical next step"
+    ]
+  }
+}

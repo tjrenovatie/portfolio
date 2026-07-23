@@ -1,0 +1,162 @@
+{
+  "metadata": {
+    "title": "TJ Renovatie - Leaders in Renovation Solutions",
+    "description": "Ontdek onze projecten, waaronder moderne woonkamers, keukenrenovaties en buitenpatio's, allemaal uitgevoerd met vakmanschap en duurzaamheid in gedachten.",
+    "keywords": "renovatie, tj renovatie, tj, bouw, bouwbedrijf, bouwbedrijf tj renovatie, aannemer, aannemer tj renovatie, tj renovatie bouwbedrijf, tj renovatie aannemer, thurston jozef, thurston jozef renovatie, thurston jozef bouwbedrijf, badkamer renovatie, badkamer renovatie tj, interieur renovatie, bouw en renovatie, verbouwing, verbouwing tj renovatie, duurzaam bouwen, duurzaam bouwen tj renovatie, verbouwingen, verbouwingen tj renovatie, interieur renovatie tj renovatie, badkamer renovatie tj renovatie, badkamer renovatie tj, tuin renovatie, tuin renovatie tj renovatie, tuin projecten"
+  },
+  "nav": {
+    "home": "HOME",
+    "about": "ABOUT",
+    "diensten": "DIENSTEN",
+    "projects": "PROJECTS",
+    "contact": "CONTACT"
+  },
+  "footer": {
+    "copyright": "2024 alle rechten voorbehouden tj-renovatie.nl"
+  },
+  "home": {
+    "taglineLine1": "Voor ontwerp, advies, verbouwing en renovatie.",
+    "taglineLine2": "Komt goed!",
+    "noSocials": "Geen social links beschikbaar.",
+    "contactCta": "Neem contact met ons op voor meer informatie"
+  },
+  "about": {
+    "eyebrow": "TJ Renovatie",
+    "title": "Renovatie met aandacht voor planning, uitvoering en afwerking.",
+    "intro1": "Mijn naam is Thurston Joseph. Met TJ Renovatie help ik klanten met duidelijke keuzes, praktisch advies en zorgvuldig uitgevoerde verbouwingen in en rond de woning.",
+    "intro2": "Of het nu gaat om een badkamer, keuken, toilet, woonkamer of een complete binnenruimte: het doel is altijd hetzelfde. Heldere afspraken, vakmanschap en een resultaat dat netjes wordt opgeleverd.",
+    "viewProjectsCta": "Bekijk projecten",
+    "profileName": "Thurston Joseph",
+    "profileCaption": "Persoonlijk contact, duidelijke communicatie en aandacht voor het werk op locatie.",
+    "contactEyebrow": "Contact",
+    "contactTitle": "Heeft u plannen voor een verbouwing?",
+    "contactBody": "Vertel kort wat u wilt aanpakken. Dan kijken we samen naar de ruimte, de planning en de beste volgende stap voor uw project.",
+    "startRequestCta": "Start uw aanvraag",
+    "highlights": ["Vrijblijvend meedenken", "Heldere planning", "Persoonlijke opvolging"],
+    "replyEyebrow": "Reactie",
+    "replyBody": "U ontvangt een persoonlijke reactie met vragen of een voorstel voor een vervolggesprek."
+  },
+  "diensten": {
+    "metaTitle": "Diensten - TJ Renovatie | Vakmanschap in elk detail",
+    "metaDescription": "Badkamerrenovatie, keukenrenovatie, tegelwerk, cinewalls en complete woningrenovaties. Vraag een vrijblijvende offerte aan bij TJ Renovatie.",
+    "heroEyebrow": "Onze diensten",
+    "heroTitle": "Van idee tot perfecte afwerking",
+    "heroBody": "Bij TJ Renovatie combineren we jarenlange ervaring met precisie in de uitvoering. Of het nu gaat om een specifieke ruimte of een volledige transformatie van uw woning, wij leveren vakmanschap dat voldoet aan de hoogste standaarden.",
+    "heroCta": "Vraag een vrijblijvende offerte aan",
+    "bathroom": {
+      "title": "Badkamerrenovatie",
+      "body": "Wij transformeren uw badkamer tot een persoonlijke spa. Van het verleggen van leidingen tot de laatste kitrand, wij ontzorgen u volledig.",
+      "imageAlt": "Luxe badkamerrenovatie met donker tegelwerk",
+      "list": [
+        "Installatie van sanitair en kranen",
+        "Waterdichte wand- en vloerafwerking",
+        "Maatwerk meubels en verlichtingsplan"
+      ],
+      "cta": "Bespreek uw project"
+    },
+    "kitchen": {
+      "title": "Keukenrenovatie",
+      "body": "De keuken is het hart van de woning. Wij realiseren keukens die niet alleen functioneel zijn, maar ook een architectonisch statement vormen.",
+      "imageAlt": "Moderne keukenrenovatie met maatwerk",
+      "list": [
+        "Aanpassen van elektra en gas/water",
+        "Vakkundige montage van apparatuur",
+        "Hoogwaardig tegelwerk en achterwanden"
+      ],
+      "cta": "Bespreek uw project"
+    },
+    "cardCategories": [
+      {
+        "title": "Tegelwerk",
+        "description": "Specialist in grootformaat tegels en complexe patronen. Perfecte voegen en naadloze overgangen."
+      },
+      {
+        "title": "Wanden en cinewalls",
+        "description": "Moderne cinewalls met geïntegreerde haard en sfeerverlichting. Strak gestucte wanden voor een moderne look."
+      },
+      {
+        "title": "Totaalrenovatie",
+        "description": "Wij nemen de gehele woning onder handen. Eén planning, één vast team en één verbluffend eindresultaat."
+      }
+    ],
+    "cardCta": "Project bespreken",
+    "promiseEyebrow": "Onze belofte",
+    "promiseTitle": "Waarom kiezen voor TJ Renovatie",
+    "benefits": [
+      {
+        "title": "Vast aanspreekpunt",
+        "description": "Directe communicatie en korte lijnen gedurende het gehele traject."
+      },
+      {
+        "title": "Nauwkeurige planning",
+        "description": "Duidelijke afspraken over deadlines en oplevermomenten."
+      },
+      {
+        "title": "Premium materialen",
+        "description": "Wij werken uitsluitend met producten van de hoogste kwaliteit."
+      },
+      {
+        "title": "Garantie op werk",
+        "description": "Zekerheid op de afwerking en de constructieve integriteit."
+      }
+    ],
+    "faqTitle": "Veelgestelde vragen",
+    "faq": [
+      {
+        "question": "Hoe lang duurt een gemiddelde badkamerrenovatie?",
+        "answer": "Een complete badkamerrenovatie duurt gemiddeld 2 tot 3 weken, afhankelijk van de complexiteit en de gekozen materialen."
+      },
+      {
+        "question": "Kan ik tijdens de renovatie in mijn woning blijven wonen?",
+        "answer": "Ja, dat kan meestal wel. We zorgen ervoor dat de overlast tot een minimum wordt beperkt en houden de werkplek elke dag schoon."
+      },
+      {
+        "question": "Zorgen jullie ook voor de afvoer van bouwafval?",
+        "answer": "Absoluut. Wij regelen de containers en de volledige afvoer van puin en oud sanitair, zodat u nergens omkijken naar heeft."
+      },
+      {
+        "question": "Moet ik zelf materialen inkopen?",
+        "answer": "Dat mag, maar het hoeft niet. Wij hebben goede contacten met leveranciers en kunnen alles voor u regelen tegen gunstige tarieven."
+      },
+      {
+        "question": "Werken jullie met vaste prijzen?",
+        "answer": "Wij werken op basis van een gespecificeerde offerte. Zo weet u vooraf exact waar u aan toe bent en zijn er geen verrassingen achteraf."
+      },
+      {
+        "question": "Zit er garantie op de uitgevoerde werkzaamheden?",
+        "answer": "Ja, wij bieden standaard garantie op al ons vakmanschap. De specifieke termijnen hangen af van het type werk en de gebruikte materialen."
+      }
+    ],
+    "faqCtaTitle": "Staat uw vraag er niet tussen?",
+    "faqCtaBody": "Wij staan klaar om al uw specifieke vragen te beantwoorden over uw aanstaande renovatie.",
+    "faqCtaButton": "Neem contact op"
+  },
+  "projects": {
+    "eyebrow": "Portfolio",
+    "title": "Onze Projecten",
+    "subtitle": "Een selectie van afgeronde renovaties, badkamers, keukens en interieurs."
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Met wat kan ik je helpen?",
+    "subtitle": "Vertel kort wat u wilt aanpakken. Ik reageer persoonlijk en denk mee over de ruimte, de planning en de beste volgende stap.",
+    "form": {
+      "nameLabel": "Naam",
+      "emailLabel": "E-mailadres",
+      "messageLabel": "Bericht",
+      "messageHelperText": "Bijvoorbeeld: type ruimte, gewenste werkzaamheden en gewenste periode.",
+      "requiredError": "Dit veld is verplicht.",
+      "invalidEmailError": "Vul een geldig e-mailadres in.",
+      "submitting": "Versturen...",
+      "submitButton": "Verstuur bericht",
+      "successMessage": "Uw bericht is verzonden. Ik neem contact met u op.",
+      "errorMessage": "Er ging iets mis. Probeer het later opnieuw."
+    },
+    "expectEyebrow": "Wat u kunt verwachten",
+    "expectPoints": [
+      "Persoonlijk advies voor uw ruimte",
+      "Duidelijke afspraken over planning",
+      "Reactie met een praktische volgende stap"
+    ]
+  }
+}
