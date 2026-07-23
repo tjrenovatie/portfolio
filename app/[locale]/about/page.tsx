@@ -9,6 +9,7 @@ import {
   MotionSection,
 } from "@/components/motion";
 import { getProfileImage } from "@/lib/site-images";
+import { routing } from "@/i18n/routing";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -64,6 +65,8 @@ const About = async () => {
     getLocale(),
   ]);
   const highlights = t.raw("highlights") as string[];
+  const localePrefix =
+    locale === routing.defaultLocale ? "" : `/${locale}`;
 
   return (
     <article className="bg-white text-neutral-900">
@@ -101,7 +104,7 @@ const About = async () => {
           </MotionP>
 
           <MotionDiv className="flex" variants={revealUp}>
-            <ButtonLink href={`/${locale}/projects`} variant="secondary">
+            <ButtonLink href={`${localePrefix}/projects`} variant="secondary">
               {t("viewProjectsCta")}
             </ButtonLink>
           </MotionDiv>
@@ -153,7 +156,7 @@ const About = async () => {
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={`/${locale}/contact`} variant="primary">
+              <ButtonLink href={`${localePrefix}/contact`} variant="primary">
                 {t("startRequestCta")}
               </ButtonLink>
             </div>

@@ -3,6 +3,7 @@ import type { Variants } from "framer-motion";
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ButtonLink } from "@/components/button";
+import { routing } from "@/i18n/routing";
 import {
   MotionDiv,
   MotionH1,
@@ -76,7 +77,8 @@ export default async function DienstenPage() {
   const benefits = (
     t.raw("benefits") as { title: string; description: string }[]
   ).map((benefit, index) => ({ ...benefit, icon: benefitIcons[index] }));
-  const contactHref = `/${locale}/contact`;
+  const contactHref =
+    locale === routing.defaultLocale ? "/contact" : `/${locale}/contact`;
 
   return (
     <article className="w-full bg-[--color-background-dark] text-[--color-text-muted]">

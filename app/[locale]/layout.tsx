@@ -22,6 +22,7 @@ export async function generateMetadata({
 
   const title = t("title");
   const description = t("description");
+  const path = locale === routing.defaultLocale ? "" : `/${locale}`;
 
   return {
     title,
@@ -29,9 +30,9 @@ export async function generateMetadata({
     keywords: t("keywords"),
     authors: [{ name: "TJ Renovatie" }],
     alternates: {
-      canonical: `https://tj-renovatie.nl/${locale}`,
+      canonical: `https://tj-renovatie.nl${path}`,
       languages: {
-        nl: "https://tj-renovatie.nl/nl",
+        nl: "https://tj-renovatie.nl",
         en: "https://tj-renovatie.nl/en",
       },
     },
@@ -39,7 +40,7 @@ export async function generateMetadata({
       title,
       description,
       type: "website",
-      url: `https://tj-renovatie.nl/${locale}`,
+      url: `https://tj-renovatie.nl${path}`,
       siteName: "TJ Renovatie",
       locale: locale === "en" ? "en_US" : "nl_NL",
       images: [

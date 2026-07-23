@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return routing.locales.flatMap((locale) =>
     routes.map((route) => ({
-      url: `https://tj-renovatie.nl/${locale}${route.path}`,
+      url: `https://tj-renovatie.nl${locale === routing.defaultLocale ? "" : `/${locale}`}${route.path}`,
       lastModified,
       changeFrequency: route.changeFrequency,
       priority: route.priority,
